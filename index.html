@@ -1131,6 +1131,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   };
 
   // ---- 核心维度数据集 ----
+  // 数据常量 (提前声明，供DIM_DATA引用，避免TDZ错误)
+  const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const BUs = ['事业部1','事业部2','事业部3','事业部4'];
+  const SUBS = ['子公司1','子公司2','子公司3','子公司4','子公司5'];
+  const CATEGORIES = ['钢材','化工原料','塑料粒子','电子元器件','包装材料','动力能源','通用备件'];
+
   const DIM_DATA = {
 
     // ===== M1-1: 月度降本追踪 =====
@@ -1487,12 +1493,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     },
     legend: { textStyle: { color: '#94a3b8', fontSize: 11 }, itemWidth: 16, itemHeight: 8, itemGap: 16, top: 4, right: 12 }
   };
-
-  // ---- 数据常量 ----
-  const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  const BUs = ['事业部1','事业部2','事业部3','事业部4'];
-  const SUBS = ['子公司1','子公司2','子公司3','子公司4','子公司5'];
-  const CATEGORIES = ['钢材','化工原料','塑料粒子','电子元器件','包装材料','动力能源','通用备件'];
 
 
   /* ================================================================
