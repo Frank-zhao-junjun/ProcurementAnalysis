@@ -1,0 +1,16 @@
+{
+  "name": "procurement-ai-proxy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/dev.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.0"
+  }
+}

@@ -1,0 +1,2064 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920" />
+  <title>采购经营分析大屏 - Procurement Intelligence Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="./styles/main.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.cn" crossorigin>
+  <link href="https://fonts.googleapis.cn/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0e1a;color:#e2e8f0;overflow-x:hidden;line-height:1.5}
+
+:root{
+  --bg-primary:#0a0e1a;--bg-secondary:#111827;--bg-card:rgba(17,24,39,0.85);
+  --border-color:rgba(56,189,248,0.15);--border-active:rgba(56,189,248,0.4);
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --accent-cyan:#38bdf8;--accent-gold:#f59e0b;--accent-green:#10b981;
+  --accent-red:#ef4444;--accent-purple:#a78bfa;
+  --gradient-header:linear-gradient(135deg,#0ea5e9 0%,#6366f1 50%,#8b5cf6 100%);
+  --radius-sm:6px;--radius-md:10px;--radius-lg:16px
+}
+
+/* ===== Header ===== */
+.dashboard-header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(10,14,26,.98) 0%,rgba(10,14,26,.92) 100%);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-color);padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-left{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.header-logo{width:36px;height:36px;background:var(--gradient-header);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;letter-spacing:-1px}
+.header-title{font-size:18px;font-weight:600;color:var(--text-primary);letter-spacing:1px}
+.header-title span{color:var(--accent-cyan)}
+.header-subtitle{font-size:12px;color:var(--text-muted);margin-top:2px}
+.header-center{display:flex;align-items:center;gap:4px;background:rgba(56,189,248,.06);border:1px solid var(--border-color);border-radius:999px;padding:3px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;-ms-overflow-style:none}
+.header-center::-webkit-scrollbar{display:none}
+.tab-btn{padding:7px 14px;border:none;border-radius:999px;background:transparent;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;transition:all .25s ease;white-space:nowrap;font-family:inherit;flex-shrink:0}
+.tab-btn:hover{color:var(--text-primary);background:rgba(56,189,248,.08)}
+.tab-btn.active{background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(99,102,241,.25));color:var(--accent-cyan);box-shadow:0 0 12px rgba(56,189,248,.15)}
+.header-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.header-time{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-cyan);background:rgba(56,189,248,.08);padding:6px 14px;border-radius:var(--radius-sm);border:1px solid rgba(56,189,248,.12)}
+.header-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4px 10px;border-radius:999px;font-weight:500}
+.badge-live{background:rgba(16,185,129,.15);color:var(--accent-green);border:1px solid rgba(16,185,129,.3)}
+.badge-live::before{content:'';width:6px;height:6px;background:var(--accent-green);border-radius:50%;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ===== Main Layout ===== */
+.dashboard-main{padding:16px 24px 32px;width:100%}
+.module-section{display:none;animation:fadeIn .4s ease}
+.module-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ===== KPI Cards ===== */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:14px 16px;position:relative;overflow:hidden;transition:all .3s ease}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient-header);opacity:0;transition:opacity .3s}
+.kpi-card:hover{border-color:var(--border-active);transform:translateY(-2px);box-shadow:0 0 20px rgba(56,189,248,.08)}
+.kpi-card:hover::before{opacity:1}
+.kpi-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.kpi-value{font-size:24px;font-weight:700;color:var(--text-primary);line-height:1.2;font-family:'JetBrains Mono',monospace}
+.kpi-value .unit{font-size:14px;font-weight:400;color:var(--text-secondary);margin-left:4px}
+.kpi-sub{display:flex;align-items:center;gap:12px;margin-top:10px;font-size:12px}
+.kpi-trend{display:flex;align-items:center;gap:4px}
+.trend-up{color:var(--accent-green)}.trend-down{color:var(--accent-red)}
+.kpi-target{color:var(--text-muted)}
+.kpi-card.cyan .kpi-value{color:var(--accent-cyan)}
+.kpi-card.gold .kpi-value{color:var(--accent-gold)}
+.kpi-card.green .kpi-value{color:var(--accent-green)}
+.kpi-card.purple .kpi-value{color:var(--accent-purple)}
+
+/* ===== Alert Panel (NEW) ===== */
+.alert-panel{background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(245,158,11,.04));border:1px solid rgba(239,68,68,.15);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px}
+.alert-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.alert-panel-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.alert-icon-danger{width:28px;height:28px;border-radius:7px;background:rgba(239,68,68,.15);color:var(--accent-red);display:flex;align-items:center;justify-content:center;font-size:14px}
+.alert-icon-warn{width:28px;height:28px;border-radius:7px;background:rgba(245,158,11,.15);color:var(--accent-gold);display:flex;align-items:center;justify-content:center;font-size:14px}
+.alert-counts{display:flex;gap:16px;font-size:12px}
+.alert-count-item{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px}
+.alert-count-high{background:rgba(239,68,68,.12);color:var(--accent-red);border:1px solid rgba(239,68,68,.25)}
+.alert-count-mid{background:rgba(245,158,11,.12);color:var(--accent-gold);border:1px solid rgba(245,158,11,.25)}
+.alert-count-ok{background:rgba(16,185,129,.12);color:var(--accent-green);border:1px solid rgba(16,185,129,.25)}
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.alert-item{background:rgba(17,24,39,.6);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px 14px;cursor:pointer;transition:all .2s}
+.alert-item:hover{border-color:var(--border-active);transform:translateY(-1px)}
+.alert-item.high{border-left:3px solid var(--accent-red)}
+.alert-item.mid{border-left:3px solid var(--accent-gold)}
+.alert-item.ok{border-left:3px solid var(--accent-green)}
+.alert-item-code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:4px}
+.alert-item-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.alert-item-desc{font-size:11.5px;color:var(--text-secondary);line-height:1.5}
+.alert-item-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:6px}
+.badge-high{background:rgba(239,68,68,.15);color:#f87171}.badge-mid{background:rgba(245,158,11,.15);color:#fbbf24}.badge-ok{background:rgba(16,185,129,.15);color:#34d399}
+
+/* ===== Ranking Panel (NEW) ===== */
+.ranking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:16px}
+.ranking-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:18px}
+.ranking-card-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ranking-list{list-style:none}
+.ranking-item{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid rgba(56,189,248,.05);transition:background .2s}
+.ranking-item:last-child{border-bottom:none}
+.ranking-item:hover{background:rgba(56,189,248,.03)}
+.ranking-rank{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:10px;flex-shrink:0}
+.rank-1{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.rank-2{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff}
+.rank-3{background:linear-gradient(135deg,#cd7c2f,#a16207);color:#fff}
+.rank-n{background:rgba(100,116,139,.15);color:var(--text-muted)}
+.ranking-name{flex:1;font-size:13px;color:var(--text-primary);font-weight:500}
+.ranking-value{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;margin-right:8px}
+.ranking-change{font-size:11.5px;font-weight:500}
+.change-up{color:var(--accent-green)}.change-down{color:var(--accent-red)}
+
+/* ===== Grid Layout ===== */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.grid-2-1{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.grid-21-21{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-full{grid-column:1/-1}
+
+/* ===== Card Panel ===== */
+.card-panel{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:16px;position:relative;transition:all .3s;overflow:hidden}
+.card-panel:hover{border-color:var(--border-active)}
+.card-panel:has(.data-table){overflow-x:auto;padding:0}
+.card-panel:has(.data-table) .data-table{min-width:600px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(56,189,248,.08);flex-wrap:wrap;gap:8px}
+.card-title{font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:6px}
+.card-title .icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:rgba(56,189,248,.12);color:var(--accent-cyan)}
+.card-actions{display:flex;gap:6px}
+.card-action-btn{padding:4px 10px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.card-action-btn:hover,.card-action-btn.active{border-color:var(--accent-cyan);color:var(--accent-cyan);background:rgba(56,189,248,.08)}
+.chart-container{width:100%;height:280px}
+.chart-container.sm{height:230px}.chart-container.lg{height:360px}
+
+/* ===== Data Table ===== */
+.data-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.data-table thead th{background:rgba(56,189,248,.06);color:var(--text-muted);font-weight:500;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-color);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.data-table tbody tr{transition:background .2s}
+.data-table tbody tr:hover{background:rgba(56,189,248,.04)}
+.data-table td{padding:8px 10px;border-bottom:1px solid rgba(56,189,248,.05);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.data-table td:first-child{color:var(--text-primary);font-weight:500}
+.progress-bar-wrap{display:flex;align-items:center;gap:8px}
+.progress-bar{flex:1;height:6px;background:rgba(100,116,139,.2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.progress-fill.good{background:linear-gradient(90deg,#10b981,#34d399)}
+.progress-fill.warn{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.progress-fill.danger{background:linear-gradient(90deg,#ef4444,#f87171)}
+.progress-text{font-size:11.5px;font-weight:600;min-width:36px;text-align:right;font-family:'JetBrains Mono',monospace}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500}
+.tag-success{background:rgba(16,185,129,.15);color:#34d399}
+.tag-warning{background:rgba(245,158,11,.15);color:#fbbf24}
+.tag-danger{background:rgba(239,68,68,.15);color:#f87171}
+.tag-info{background:rgba(56,189,248,.15);color:#38bdf8}
+.data-table.compact{font-size:11px}
+.data-table.compact td,.data-table.compact th{padding:6px 8px}
+.data-table td:first-child{max-width:none}
+
+/* ===== Insight Box ===== */
+.insight-box{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.05));border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-md);padding:12px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start}
+.insight-icon{font-size:18px;line-height:1;margin-top:2px}
+.insight-content{flex:1}
+.insight-title{font-size:13px;font-weight:600;color:var(--accent-gold);margin-bottom:4px}
+.insight-desc{font-size:12.5px;color:var(--text-secondary);line-height:1.6}
+
+/* ===== Section Title ===== */
+.section-block{margin-bottom:20px}
+.section-title{font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:12px;padding-left:10px;border-left:3px solid var(--accent-cyan);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.section-title .subtitle{font-size:12px;color:var(--text-muted);font-weight:400}
+
+/* ===== Time Toggle & Dimension Toggle ===== */
+.time-toggle{display:flex;gap:4px;background:rgba(56,189,248,.06);border-radius:8px;padding:3px}
+.time-toggle button{padding:5px 14px;border:none;border-radius:6px;background:transparent;color:var(--text-muted);font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+.time-toggle button.active{background:var(--accent-cyan);color:#0a0e1a;font-weight:600}
+.time-toggle button:hover:not(.active){color:var(--text-primary)}
+
+.dim-toggle{display:flex;gap:4px;background:rgba(167,139,250,.06);border-radius:8px;padding:3px}
+.dim-toggle button{padding:5px 12px;border:none;border-radius:6px;background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
+.dim-toggle button.active{background:var(--accent-purple);color:#fff;font-weight:600}
+.dim-toggle button:hover:not(.active){color:var(--text-primary)}
+
+/* ===== Price Alert Banner ===== */
+.price-alert-banner{background:linear-gradient(90deg,rgba(16,185,129,.08),rgba(56,189,248,.08));border:1px solid rgba(16,185,129,.2);border-radius:var(--radius-md);padding:14px 20px;display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.alert-body{flex:1}
+.alert-title{font-size:14px;font-weight:600;color:var(--accent-green)}
+.alert-desc{font-size:12.5px;color:var(--text-secondary);margin-top:3px}
+.alert-actions{display:flex;gap:8px}
+.btn-sm{padding:6px 16px;border-radius:6px;border:none;font-size:12px;cursor:pointer;font-weight:500;font-family:inherit;transition:all .2s}
+.btn-primary{background:var(--accent-cyan);color:#0a0e1a}.btn-primary:hover{filter:brightness(1.1)}
+.btn-outline{background:transparent;border:1px solid var(--border-color);color:var(--text-secondary)}.btn-outline:hover{border-color:var(--accent-cyan);color:var(--accent-cyan)}
+
+/* ===== Utility ===== */
+.text-cyan{color:var(--accent-cyan)!important}.text-gold{color:var(--accent-gold)!important}
+.text-green{color:var(--accent-green)!important}.text-red{color:var(--accent-red)!important}
+.text-purple{color:var(--accent-purple)!important}.text-mono{font-family:'JetBrains Mono',monospace}
+.flex-between{display:flex;align-items:center;justify-content:space-between}
+.mt-16{margin-top:16px}.mb-16{margin-bottom:16px}
+.risk-high{color:var(--accent-red);font-weight:600}.risk-medium{color:var(--accent-gold);font-weight:600}.risk-low{color:var(--accent-green);font-weight:600}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(56,189,248,.2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(56,189,248,.35)}
+
+.dashboard-footer{text-align:center;padding:16px;color:var(--text-muted);font-size:11px;border-top:1px solid var(--border-color);margin-top:16px}
+
+/* ===== Alert Banner (Tab3) ===== */
+.alert-banner{display:flex;flex-direction:column;gap:8px;background:linear-gradient(135deg,rgba(239,68,68,.04),rgba(245,158,11,.03));border:1px solid rgba(239,68,68,.1);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px}
+.alert-banner-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;padding:6px 10px;border-radius:6px;line-height:1.5}
+.alert-banner-icon{font-size:14px;flex-shrink:0}
+.alert-banner-high{background:rgba(239,68,68,.08);border-left:3px solid var(--accent-red)}
+.alert-banner-mid{background:rgba(245,158,11,.08);border-left:3px solid var(--accent-gold)}
+.alert-banner-ok{background:rgba(16,185,129,.06);border-left:3px solid var(--accent-green)}
+
+/* ===== Strategy Cards (Tab3) ===== */
+.strategy-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:16px;transition:all .2s}
+.strategy-card:hover{border-color:var(--border-active);transform:translateY(-2px)}
+.strategy-header{font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.strategy-body p{font-size:12px;color:var(--text-secondary);margin-bottom:6px;line-height:1.5}
+.strategy-tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;margin-top:4px}
+.strategy-warn{border-top:3px solid var(--accent-gold)}.strategy-good{border-top:3px solid var(--accent-green)}
+
+/* ===== Metric Cards (Tab7) ===== */
+.metric-card{text-align:center;padding:16px 12px;border-radius:var(--radius-lg);background:var(--bg-card);border:1px solid var(--border-color)}
+.metric-value{font-size:28px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1.2}
+.metric-label{font-size:12px;color:var(--text-secondary);margin-top:6px}
+.metric-good .metric-value{color:var(--accent-green)}.metric-warn .metric-value{color:var(--accent-gold)}.metric-danger .metric-value{color:var(--accent-red)}
+
+/* ===== Rank Number Text ===== */
+.rank-num{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.rank-1-text{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.rank-2-text{background:linear-gradient(135deg,#94a3b8,#64748b)}
+.rank-3-text{background:linear-gradient(135deg,#cd7c2f,#a16207)}
+
+/* ===== Responsive Fallbacks ===== */
+@media(max-width:1400px){
+  .kpi-row{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .kpi-value{font-size:21px}
+  .grid-2{grid-template-columns:1fr}
+  .grid-2-1{grid-template-columns:1fr}
+  .ranking-grid{grid-template-columns:1fr}
+  .alert-grid{grid-template-columns:1fr}
+  .chart-container.lg{height:300px}
+}
+@media(max-width:1000px){
+  .kpi-row{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .kpi-card{padding:10px 12px}
+  .kpi-value{font-size:18px}
+  .header-title{font-size:15px}
+  .header-subtitle{display:none}
+  .grid-3{grid-template-columns:1fr}
+}
+  </style>
+</head>
+<body>
+
+<!-- ==================== HEADER ==================== -->
+<header class="dashboard-header">
+  <div class="header-left">
+    <div class="header-logo">PI</div>
+    <div>
+      <div class="header-title">采购经营<span>智能分析</span>平台</div>
+      <div class="header-subtitle">Procurement Intelligence Dashboard · 周一晨会汇报</div>
+    </div>
+  </div>
+  <nav class="header-center" id="mainTabs">
+    <button class="tab-btn active" data-tab="tabHome">🏠 驾驶舱</button>
+    <button class="tab-btn" data-tab="tab1">降本分析</button>
+    <button class="tab-btn" data-tab="tab2">支出分析</button>
+    <button class="tab-btn" data-tab="tab3">价格趋势</button>
+    <button class="tab-btn" data-tab="tab4">需求趋势</button>
+    <button class="tab-btn" data-tab="tab5">材料成本率</button>
+    <button class="tab-btn" data-tab="tab6">降本机会</button>
+    <button class="tab-btn" data-tab="tab7">供应源分析</button>
+  </nav>
+  <div class="header-right">
+    <div class="header-time" id="headerTime">2025-01-20 09:00:00</div>
+    <span class="header-badge badge-live">实时数据</span>
+  </div>
+</header>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="dashboard-main">
+
+  <!-- ============================================================ -->
+  <!-- TAB HOME: 总监驾驶舱 (30秒判断)                                -->
+  <!-- ============================================================ -->
+  <section class="module-section active" id="tabHome">
+
+    <!-- 核心KPI - 10个关键指标 -->
+    <div class="kpi-row">
+      <div class="kpi-card cyan">
+        <div class="kpi-label">年度采购额</div>
+        <div class="kpi-value">48.67<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span><span class="kpi-target">预算: 52.00亿</span></div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-label">年度降本额</div>
+        <div class="kpi-value">2.84<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 15.2% YoY</span><span class="kpi-target">目标: 3.50亿 | 达成率81.1%</span></div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">降本比例</div>
+        <div class="kpi-value">5.84<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +0.33pp YoY</span><span class="kpi-target">目标: 7.00%</span></div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">全年预测降本</div>
+        <div class="kpi-value">3.26<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 同比+22.1%</span><span class="kpi-target">达成预估93.1%</span></div>
+      </div>
+      <div class="kpi-card cyan">
+        <div class="kpi-label">预算执行率</div>
+        <div class="kpi-value">93.6<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-target">剩余额度: 3.33亿</span></div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">材料成本率</div>
+        <div class="kpi-value">68.4<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; -0.8pp YoY</span><span class="kpi-target">持续优化中</span></div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-label">供应商平均绩效</div>
+        <div class="kpi-value">82.6<span class="unit">分</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +2.3分 YoY</span><span class="kpi-target">目标基准: 80分</span></div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">交付及时率</div>
+        <div class="kpi-value">94.2<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +1.8pp YoY</span><span class="kpi-target">目标: 95%</span></div>
+      </div>
+    </div>
+
+    <!-- ===== 预警摘要面板 (6条P0规则) ===== -->
+    <div class="alert-panel">
+      <div class="alert-panel-header">
+        <div class="alert-panel-title">
+          <span class="alert-icon-danger">&#128680;</span>
+          实时预警监控 — P0规则触发状态
+          <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:8px;">数据截止: 2025-01-19 23:59</span>
+        </div>
+        <div class="alert-counts">
+          <span class="alert-count-item alert-count-high">&#128308; 高危 <strong>2</strong></span>
+          <span class="alert-count-item alert-count-mid">&#9888;&#65039; 中危 <strong>2</strong></span>
+          <span class="alert-count-item alert-count-ok">&#9989; 正常 <strong>2</strong></span>
+        </div>
+      </div>
+      <div class="alert-grid">
+        <!-- AL_PRICE_001: HIGH -->
+        <div class="alert-item high" onclick="switchTab('tab2')">
+          <div class="alert-item-code">AL_PRICE_001</div>
+          <div class="alert-item-title text-red">&#128200; 钢材采购价偏离市场均价 <span class="badge badge-high">高危</span></div>
+          <div class="alert-item-desc">当前偏离度 <strong>+5.8%</strong>，超过高危阈值(8%未达但接近)。热轧卷板我司均价3880元/吨 vs 市场公允价3667元/吨。月度潜在超支约<strong class="text-red"> 420万元</strong>。</div>
+        </div>
+        <!-- AL_INVENTORY_003: HIGH -->
+        <div class="alert-item high" onclick="switchTab('tab4')">
+          <div class="alert-item-code">AL_INVENTORY_003</div>
+          <div class="alert-item-title text-red">&#128230; 塑料粒子缺货风险 <span class="badge badge-high">高危</span></div>
+          <div class="alert-item-desc">可支撑天数仅<strong>12.8天</strong>，低于安全线(10天以上为安全，但接近警戒线15天)。PP拉丝库存4,260吨，日均消耗332吨/天。建议72小时内启动紧急补货。</div>
+        </div>
+        <!-- AL_SPEND_002: MID -->
+        <div class="alert-item mid" onclick="switchTab('tab2')">
+          <div class="alert-item-code">AL_SPEND_002</div>
+          <div class="alert-item-title text-gold">&#128176; 事业部3支出突增 <span class="badge badge-mid">中危</span></div>
+          <div class="alert-item-desc">12月支出环比增长<strong>+18.5%</strong>（接近20%阈值），同比+28.4%（已超25%阈值）。主要因电池包原材料备货及新产线爬坡导致。</div>
+        </div>
+        <!-- AL_SUPPLIER_002: MID -->
+        <div class="alert-item mid" onclick="switchTab('tab7')">
+          <div class="alert-item-code">AL_SUPPLIER_002</div>
+          <div class="alert-item-title text-gold">&#128172; 部分供应商交付及时率下滑 <span class="badge badge-mid">中危</span></div>
+          <div class="alert-item-desc"><strong>利安德巴塞尔</strong>近3月交付及时率降至87.2%（低于95%中危线），累计延迟交货6批次，影响产线排产。</div>
+        </div>
+        <!-- AL_SPEND_001: OK -->
+        <div class="alert-item ok" onclick="switchTab('tab1')">
+          <div class="alert-item-code">AL_SPEND_001</div>
+          <div class="alert-item-title text-green">&#128202; 预算执行率正常 <span class="badge badge-ok">正常</span></div>
+          <div class="alert-item-desc">集团整体预算执行率93.6%，偏离目标(-6.4pp)在可控范围内(<10pp)。剩余额度3.33亿可支撑Q1需求。</div>
+        </div>
+        <!-- AL_SUPPLIER_003: OK -->
+        <div class="alert-item ok" onclick="switchTab('tab7')">
+          <div class="alert-item-code">AL_SUPPLIER_003</div>
+          <div class="alert-item-title text-green">&#127981; 独家供应风险可控 <span class="badge badge-ok">正常</span></div>
+          <div class="alert-item-desc">独家供应物料共34个SKU，其中高危8个（年采购额>500万）。已制定二供开发计划，Q1预计完成3个品类的供应商引入。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 组织排名区 ===== -->
+    <div class="ranking-grid">
+      <!-- 事业部降本排名 -->
+      <div class="ranking-card">
+        <div class="ranking-card-title"><span style="color:var(--accent-cyan);">&#127942;</span> 事业部降本排名 (按达成率)</div>
+        <ul class="ranking-list">
+          <li class="ranking-item">
+            <span class="ranking-rank rank-1">1</span>
+            <span class="ranking-name">事业部1</span>
+            <span class="ranking-value text-cyan">8,620万</span>
+            <span class="ranking-change change-up">107.8% &#9650;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-2">2</span>
+            <span class="ranking-name">事业部2</span>
+            <span class="ranking-value text-cyan">7,240万</span>
+            <span class="ranking-change change-mid">96.5% &#8960;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-3">3</span>
+            <span class="ranking-name">事业部3</span>
+            <span class="ranking-value text-cyan">6,830万</span>
+            <span class="ranking-change change-down">94.9% &#9660;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-n">4</span>
+            <span class="ranking-name">事业部4</span>
+            <span class="ranking-value text-cyan">5,710万</span>
+            <span class="ranking-change change-down">87.8% &#9660;</span>
+          </li>
+        </ul>
+      </div>
+      <!-- 子公司排名 -->
+      <div class="ranking-card">
+        <div class="ranking-card-title"><span style="color:var(--accent-purple);">&#127970;</span> 子公司降本排名 (按达成率)</div>
+        <ul class="ranking-list">
+          <li class="ranking-item">
+            <span class="ranking-rank rank-1">1</span>
+            <span class="ranking-name">子公司1</span>
+            <span class="ranking-value text-purple">7,640万</span>
+            <span class="ranking-change change-up">95.5% &#9650;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-2">2</span>
+            <span class="ranking-name">子公司2</span>
+            <span class="ranking-value text-purple">6,320万</span>
+            <span class="ranking-change change-mid">92.9% &#8960;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-3">3</span>
+            <span class="ranking-name">子公司3</span>
+            <span class="ranking-value text-purple">5,860万</span>
+            <span class="ranking-change change-mid">97.7% &#9650;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-n">4</span>
+            <span class="ranking-name">子公司4</span>
+            <span class="ranking-value text-purple">4,920万</span>
+            <span class="ranking-change change-down">94.6% &#9660;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-n">5</span>
+            <span class="ranking-name">子公司5</span>
+            <span class="ranking-value text-purple">3,720万</span>
+            <span class="ranking-change change-down">93.0% &#9660;</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 决策摘要 -->
+    <div class="insight-box">
+      <div class="insight-icon">&#128161;</div>
+      <div class="insight-content">
+        <div class="insight-title">总监决策摘要 — 本周重点关注事项</div>
+        <div class="insight-desc">
+          <strong class="text-red">&#9888; 紧急：</strong>钢材采购价偏离市场+5.8%，建议本周启动与宝武/鞍钢的价格复议谈判；塑料粒子库存仅12.8天需紧急补货。<br/>
+          <strong class="text-gold">&#128176; 重要：</strong>事业部3支出突增(+28.4% YoY)，需核实是否为新项目一次性投入还是持续性超支；利安德巴塞尔交付率降至87.2%需约谈改进。<br/>
+          <strong class="text-green">&#9989; 正常推进：</strong>全年预测降本3.26亿(达成率93.1%)，Q4月均提速至3200万；长约覆盖率提升至58.6%(+8.2pp)；VMI覆盖率34.2%仍有较大优化空间。
+        </div>
+      </div>
+    </div>
+
+    <!-- 快速下钻入口 -->
+    <div class="section-block mt-16">
+      <div class="section-title">专题分析快速入口</div>
+      <div class="grid-4">
+        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab1')">
+          <div style="font-size:32px;margin-bottom:10px;">&#128176;</div>
+          <div style="font-size:14px;font-weight:600;">降本分析</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">采购额 / 降本额 / 品类明细</div>
+        </div>
+        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab2')">
+          <div style="font-size:32px;margin-bottom:10px;">&#128200;</div>
+          <div style="font-size:14px;font-weight:600;">支出分析</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">核心品类 / 价格偏差 / TCO</div>
+        </div>
+        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab3')">
+          <div style="font-size:32px;margin-bottom:10px;">&#128202;</div>
+          <div style="font-size:14px;font-weight:600;">价格趋势</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">市场价 / 期货 / 锁价建议</div>
+        </div>
+        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab7')">
+          <div style="font-size:32px;margin-bottom:10px;">&#129307;</div>
+          <div style="font-size:14px;font-weight:600;">供应源分析</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">绩效评估 / 风险识别</div>
+        </div>
+      </div>
+    </div>
+
+  </section><!-- END tabHome -->
+
+
+  <!-- ============================================================ -->
+  <!-- TAB 1: 降本分析                                              -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab1">
+    <div class="kpi-row">
+      <div class="kpi-card cyan"><div class="kpi-label">年度采购额(实际)</div><div class="kpi-value">48.67<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span><span class="kpi-target">预算:52.00亿</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">年度降本额(实际)</div><div class="kpi-value">2.84<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 15.2% YoY</span><span class="kpi-target">目标:3.50亿</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">年度降本比例</div><div class="kpi-value">5.84<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +0.33pp</span><span class="kpi-target">目标:7.00%</span></div></div>
+      <div class="kpi-card purple"><div class="kpi-label">全年预测降本</div><div class="kpi-value">3.26<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 同比+22.1%</span><span class="kpi-target">达成预估93.1%</span></div></div>
+      <div class="kpi-card cyan"><div class="kpi-label">预算执行率</div><div class="kpi-value">93.6<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-target">剩余额度:3.33亿</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">降本达成率</div><div class="kpi-value">81.1<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-target">距目标差额:0.66亿</span></div></div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">&#128161;</div>
+      <div class="insight-content">
+        <div class="insight-title">VAVE降本周报摘要</div>
+        <div class="insight-desc">累计降本<strong class="text-cyan">2.84亿</strong>，达成率<strong class="text-gold">81.1%</strong>。Q4月均提速至<strong class="text-green">3,200万</strong>，预计全年达<strong class="text-cyan">3.26亿</strong>(同比+22.1%)。<strong class="text-gold">关注：</strong>塑料粒子缺口1,200万；非生产品类VMI仅34%。</div>
+      </div>
+    </div>
+
+    <!-- 月度降本追踪 (支持维度切换) -->
+    <div class="section-block">
+      <div class="section-title">月度降本追踪
+        <div style="margin-left:auto;display:flex;gap:12px;align-items:center;">
+          <div class="dim-toggle" data-dim-group="m1" data-dim-target="chartMonthlySavings">
+            <button class="active" data-dim="集团">集团</button><button data-dim="事业部1">事业部1</button><button data-dim="事业部2">事业部2</button><button data-dim="事业部3">事业部3</button>
+          </div>
+          <div class="time-toggle"><button class="active">2025年</button><button>2024年</button></div>
+        </div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartMonthlySavings"></div></div>
+    </div>
+
+    <!-- 事业部/子公司降本 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel">
+        <div class="card-header"><div class="card-title"><span class="icon">&#127981;</span>事业部降本达成</div><div class="card-actions"><button class="card-action-btn active">实际vs目标</button><button class="card-action-btn">达成率</button></div></div>
+        <div class="chart-container" id="chartBuSavings"></div>
+      </div>
+      <div class="card-panel">
+        <div class="card-header"><div class="card-title"><span class="icon">&#127970;</span>子公司降本达成</div><div class="card-actions"><button class="card-action-btn active">实际vs目标</button><button class="card-action-btn">达成率</button></div></div>
+        <div class="chart-container" id="chartSubSavings"></div>
+      </div>
+    </div>
+
+    <!-- 七大品类明细表 -->
+    <div class="section-block mt-16">
+      <div class="section-title">七大品类降本明细 <span class="subtitle">实际 / 目标 / 达成率 / 风险标签</span></div>
+      <div class="card-panel" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr><th>品类</th><th>实际降本(万)</th><th>目标(万)</th><th>达成率</th><th>YoY</th><th>主要手段</th><th>风险</th></tr></thead>
+          <tbody>
+            <tr><td>钢材</td><td class="text-cyan text-mono">8,620</td><td class="text-mono">8,000</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill good" style="width:107.75%"></div></div><span class="progress-text text-green">107.8%</span></div></td><td class="text-green">+18.3%</td><td>长约锁价+集采</td><td><span class="tag tag-success">超额</span></td></tr>
+            <tr><td>化工原料</td><td class="text-cyan text-mono">6,340</td><td class="text-mono">7,200</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill warn" style="width:88.06%"></div></div><span class="progress-text text-gold">88.1%</span></div></td><td class="text-green">+12.1%</td><td>VAVE+联合谈判</td><td><span class="tag tag-warning">需加速</span></td></tr>
+            <tr><td>塑料粒子</td><td class="text-cyan text-mono">4,180</td><td class="text-mono">5,800</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill danger" style="width:72.07%"></div></div><span class="progress-text text-red">72.1%</span></div></td><td class="text-red">-8.5%</td><td>进口替代+框架</td><td><span class="tag tag-danger">缺口大</span></td></tr>
+            <tr><td>电子元器件</td><td class="text-cyan text-mono">3,560</td><td class="text-mono">4,000</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill warn" style="width:89%"></div></div><span class="progress-text text-gold">89.0%</span></div></td><td class="text-green">+5.2%</td><td>国产化+议价</td><td><span class="tag tag-warning">基本达标</span></td></tr>
+            <tr><td>包装材料</td><td class="text-cyan text-mono">2,240</td><td class="text-mono">2,500</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill warn" style="width:89.6%"></div></div><span class="progress-text text-gold">89.6%</span></div></td><td class="text-green">+9.7%</td><td>标准化+区域集采</td><td><span class="tag tag-warning">基本达标</span></td></tr>
+            <tr><td>动力能源</td><td class="text-cyan text-mono">2,100</td><td class="text-mono">2,000</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill good" style="width:105%"></div></div><span class="progress-text text-green">105.0%</span></div></td><td class="text-green">+22.4%</td><td>峰谷优化+长协</td><td><span class="tag tag-success">超额</span></td></tr>
+            <tr><td>通用备件</td><td class="text-cyan text-mono">1,360</td><td class="text-mono">1,500</td><td><div class="progress-bar-wrap"><div class="progress-bar"><div class="progress-fill warn" style="width:90.67%"></div></div><span class="progress-text text-gold">90.7%</span></div></td><td class="text-green">+3.1%</td><td>品牌归一+延寿</td><td><span class="tag tag-warning">基本达标</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 非生产品类 -->
+    <div class="section-block mt-16">
+      <div class="section-title">非生产品类降本 <span class="subtitle">预算 / 入库收货 / 达成率</span></div>
+      <div class="grid-3">
+        <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128200;</span>MRO物料</div></div><div class="chart-container sm" id="chartMroSavings"></div></div>
+        <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128187;</span>IT设备与服务</div></div><div class="chart-container sm" id="chartItSavings"></div></div>
+        <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#127968;</span>物流与仓储服务</div></div><div class="chart-container sm" id="chartLogisticsSavings"></div></div>
+      </div>
+    </div>
+
+    <!-- 趋势图 + 预测仪表盘 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128176;</span>采购额趋势(实际vs预算)</div><div class="time-toggle"><button class="active">年度</button><button>季度</button><button>月度</button></div></div><div class="chart-container sm" id="chartProcureAmount"></div></div>
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128290;</span>降本比例趋势(实际vs计划)</div><div class="time-toggle"><button class="active">年度</button><button>季度</button><button>月度</button></div></div><div class="chart-container sm" id="chartSavingRatio"></div></div>
+    </div>
+
+    <!-- 全年预测 -->
+    <div class="section-block mt-16">
+      <div class="section-title">全年预测降本分析 <span class="subtitle">基于当前趋势的年终预测</span></div>
+      <div class="grid-3">
+        <div class="card-panel" style="text-align:center;"><div class="kpi-label" style="margin-bottom:12px;">预测金额</div><div class="kpi-value text-cyan" style="font-size:36px;">3.26<span class="unit">亿</span></div><div class="kpi-sub" style="justify-content:center;"><span class="text-muted">置信区间: 3.08~3.44亿</span></div><div class="chart-container sm" id="chartForecastAmount" style="height:160px;margin-top:12px;"></div></div>
+        <div class="card-panel" style="text-align:center;"><div class="kpi-label" style="margin-bottom:12px;">同比去年</div><div class="kpi-value text-green" style="font-size:36px;">+22.1<span class="unit">%</span></div><div class="kpi-sub" style="justify-content:center;"><span class="text-muted">去年全年: 2.67亿</span></div><div class="chart-container sm" id="chartForecastYoy" style="height:160px;margin-top:12px;"></div></div>
+        <div class="card-panel" style="text-align:center;"><div class="kpi-label" style="margin-bottom:12px;">预测降比</div><div class="kpi-value text-gold" style="font-size:36px;">6.52<span class="unit">%</span></div><div class="kpi-sub" style="justify-content:center;"><span class="text-muted">目标:7.00% | 差距:-0.48pp</span></div><div class="chart-container sm" id="chartForecastRatio" style="height:160px;margin-top:12px;"></div></div>
+      </div>
+    </div>
+  </section><!-- END tab1 -->
+
+
+  <!-- ============================================================ -->
+  <!-- TAB 2: 支出分析                                              -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab2">
+    <div class="kpi-row">
+      <div class="kpi-card cyan"><div class="kpi-label">年度总支出</div><div class="kpi-value">48.67<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span><span class="kpi-target">核心3品类:62.4%</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">市场价格偏差度</div><div class="kpi-value">+3.2<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; 较Q2收窄1.5pp</span><span class="kpi-target">钢材偏差最大:+5.8%</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">VMI覆盖率</div><div class="kpi-value">34.2<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; Q4提升4pp</span><span class="kpi-target">目标:50%</span></div></div>
+      <div class="kpi-card purple"><div class="kpi-label">长约占比</div><div class="kpi-value">58.6<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +8.2pp YoY</span><span class="kpi-target">目标:65%</span></div></div>
+      <div class="kpi-card cyan"><div class="kpi-label">供应商集中度CR5</div><div class="kpi-value">67.3<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; 风险可控</span><span class="kpi-target">警戒线:75%</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">TCO物流成本占比</div><div class="kpi-value">8.4<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; -0.6pp</span><span class="kpi-target">目标:&lt;8%</span></div></div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">&#128176;</div>
+      <div class="insight-content">
+        <div class="insight-title">支出分析 — 关键降本机会识别</div>
+        <div class="insight-desc">核心三大品类占<strong class="text-cyan">62.4%</strong>。价格偏差<strong class="text-gold">+3.2%</strong>，钢材最大(+5.8%)，约<strong class="text-red">2,800万</strong>优化空间。VMI仅<strong class="text-gold">34.2%</strong>，提升至50%可释放库存资金约<strong class="text-green">1.5亿</strong>。</div>
+      </div>
+    </div>
+
+    <!-- 核心品类支出 (支持维度切换) -->
+    <div class="section-block">
+      <div class="section-title">核心品类支出分布
+        <div style="margin-left:auto;display:flex;gap:12px;">
+          <div class="dim-toggle" data-dim-group="m2spend" data-dim-target="chartCoreSpend,spendTable">
+            <button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2-1">
+        <div class="card-panel"><div class="chart-container" id="chartCoreSpend"></div></div>
+        <div class="card-panel">
+          <div class="card-header"><div class="card-title"><span class="icon">&#128202;</span>Top10明细</div></div>
+          <table class="data-table" id="spendTable">
+            <thead><tr><th>组织/品类</th><th>金额(亿)</th><th>占比</th><th>YoY</th></tr></thead>
+            <tbody>
+              <tr><td>钢材-事业部1</td><td class="text-mono text-cyan">8.62</td><td>17.7%</td><td class="text-red">+12.3%</td></tr>
+              <tr><td>化工原料-零部件</td><td class="text-mono text-cyan">7.24</td><td>14.9%</td><td class="text-green">+6.8%</td></tr>
+              <tr><td>塑料粒子-整车</td><td class="text-mono text-cyan">5.86</td><td>12.0%</td><td class="text-red">+15.2%</td></tr>
+              <tr><td>钢材-零部件</td><td class="text-mono text-cyan">5.42</td><td>11.1%</td><td class="text-green">+4.1%</td></tr>
+              <tr><td>化工原料-新能源</td><td class="text-mono text-cyan">4.18</td><td>8.6%</td><td class="text-green">+22.4%</td></tr>
+              <tr><td>电子元器件-整车</td><td class="text-mono text-cyan">3.64</td><td>7.5%</td><td class="text-green">+3.2%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 价格偏差 + 走势对比 -->
+    <div class="section-block mt-16">
+      <div class="section-title">市场价格偏差度分析
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card-panel"><div class="chart-container" id="chartPriceDeviation"></div></div>
+        <div class="card-panel"><div class="chart-container" id="chartPriceTrendCompare"></div></div>
+      </div>
+    </div>
+
+    <!-- 库存vs支出 -->
+    <div class="section-block mt-16">
+      <div class="section-title">库存水位 vs 支出走势 <span class="subtitle">降低库占资金的机会</span></div>
+      <div class="card-panel"><div class="chart-container lg" id="chartInventorySpend"></div></div>
+    </div>
+
+    <!-- VMI + 供应商集中度 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128710;</span>VMI品类占比</div><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div><div class="chart-container sm" id="chartVMI"></div></div>
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#129307;</span>供应商集中度CR5</div><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div><div class="chart-container sm" id="chartSupplierConc"></div></div>
+    </div>
+
+    <!-- TCO -->
+    <div class="section-block mt-16">
+      <div class="section-title">TCO成本构成 <span class="subtitle">物流 / 仓储 / 税费 全成本视角</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div>
+      </div>
+      <div class="grid-3">
+        <div class="card-panel"><div class="card-header"><div class="card-title">按品类</div></div><div class="chart-container sm" id="chartTCOCategory"></div></div>
+        <div class="card-panel"><div class="card-header"><div class="card-title">按事业部</div></div><div class="chart-container sm" id="chartTCOBu"></div></div>
+        <div class="card-panel"><div class="card-header"><div class="card-title">按子公司</div></div><div class="chart-container sm" id="chartTCOSubsidiary"></div></div>
+      </div>
+    </div>
+
+    <!-- 长约 -->
+    <div class="section-block mt-16">
+      <div class="section-title">长约占比(战略寻源) <span class="subtitle">锁定价格波动风险</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card-panel"><div class="chart-container" id="chartLongContract"></div></div>
+        <div class="card-panel">
+          <div class="card-header"><div class="card-title"><span class="icon">&#128203;</span>长约执行明细</div></div>
+          <table class="data-table">
+            <thead><tr><th>品类</th><th>覆盖率</th><th>锁定期</th><th>锁价节约</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>钢材</td><td class="text-green text-mono">78.5%</td><td>12月</td><td class="text-cyan text-mono">+3,200万</td><td><span class="tag tag-success">生效中</span></td></tr>
+              <tr><td>化工原料</td><td class="text-gold text-mono">52.3%</td><td>6月</td><td class="text-cyan text-mono">+1,100万</td><td><span class="tag tag-warning">续签中</span></td></tr>
+              <tr><td>塑料粒子</td><td class="text-red text-mono">35.8%</td><td>-</td><td class="text-muted text-mono">-</td><td><span class="tag tag-danger">待谈判</span></td></tr>
+              <tr><td>动力能源</td><td class="text-green text-mono">92.0%</td><td>24月</td><td class="text-cyan text-mono">+850万</td><td><span class="tag tag-success">稳定</span></td></tr>
+              <tr><td>电子元器件</td><td class="text-gold text-mono">45.2%</td><td>季度框架</td><td class="text-cyan text-mono">+420万</td><td><span class="tag tag-warning">部分覆盖</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section><!-- END tab2 -->
+
+
+  <!-- ============================================================ -->
+  <!-- TAB 3: 价格趋势分析                                          -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab3">
+    <!-- 实时预警Banner -->
+    <div class="alert-banner">
+      <div class="alert-banner-item alert-banner-high">
+        <span class="alert-banner-icon">&#128200;</span>
+        <span><strong>钢材</strong> — 热轧卷板: 我司均价3,880元/吨 vs 市场价3,667元/吨，偏离<strong>+5.8%</strong> (高危阈值8%)</span>
+      </div>
+      <div class="alert-banner-item alert-banner-mid">
+        <span class="alert-banner-icon">&#128202;</span>
+        <span><strong>塑料粒子</strong> — PP拉丝: 我司均价7,850元/吨 vs 市场价7,620元/吨，偏离<strong>+3.0%</strong> (中危阈值5%)</span>
+      </div>
+      <div class="alert-banner-item alert-banner-ok">
+        <span class="alert-banner-icon">&#9989;</span>
+        <span><strong>化工原料</strong> — MDI: 我司均价16,800元/吨 vs 市场价17,100元/吨，偏离<strong>-1.8%</strong> (正常)</span>
+      </div>
+      <div class="alert-banner-item alert-banner-ok">
+        <span class="alert-banner-icon">&#127760;</span>
+        <span><strong>汇率</strong> — USD/CNY: 7.2480，较上月<strong>-0.5%</strong>，进口成本影响有限</span>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card gold"><div class="kpi-label">钢材(热轧卷板)</div><div class="kpi-value">3,880<span class="unit">元/吨</span></div><div class="kpi-sub"><span class="text-red">偏离+5.8% &#9888;</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">塑料粒子(PP拉丝)</div><div class="kpi-value">7,850<span class="unit">元/吨</span></div><div class="kpi-sub"><span class="text-gold">偏离+3.0%</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">化工原料(MDI)</div><div class="kpi-value">16,800<span class="unit">元/吨</span></div><div class="kpi-sub"><span class="text-green">偏离-1.8% &#10004;</span></div></div>
+      <div class="kpi-card cyan"><div class="kpi-label">USD/CNY汇率</div><div class="kpi-value">7.2480<span class="unit"></span></div><div class="kpi-sub"><span class="text-green">MoM -0.5%</span></div></div>
+    </div>
+
+    <!-- 市场价格趋势 -->
+    <div class="section-block">
+      <div class="section-title">核心品类市场价格走势
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="热轧卷板">热轧卷板</button><button data-dim="PP拉丝">PP拉丝</button><button data-dim="MDI">MDI</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartMarketPriceTrend"></div></div>
+    </div>
+
+    <!-- 期货 + 宏观 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128200;</span>大宗商品期货价格</div><div class="dim-toggle"><button class="active" data-dim="螺纹钢">螺纹钢</button><button data-dim="原油">原油</button><button data-dim="PP期货">PP期货</button></div></div><div class="chart-container sm" id="chartFuturesPrice"></div></div>
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#127971;</span>宏观经济指标</div></div><div class="chart-container sm" id="chartMacroIndicators"></div></div>
+    </div>
+
+    <!-- 采购vs市场 -->
+    <div class="section-block mt-16">
+      <div class="section-title">历史采购价 vs 市场公允价 <span class="subtitle">识别采购时机与议价空间</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="热轧卷板">热轧卷板</button><button data-dim="PP拉丝">PP拉丝</button><button data-dim="MDI">MDI</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartProcureVsMarket"></div></div>
+    </div>
+
+    <!-- 库存水位 + 价格预测 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128230;</span>各事业部库存水位</div><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button></div></div><div class="chart-container sm" id="chartInventoryLevel"></div></div>
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128257;</span>价格预判与置信区间</div><div class="dim-toggle"><button class="active" data-dim="热轧卷板">热轧卷板</button><button data-dim="PP拉丝">PP拉丝</button><button data-dim="MDI">MDI</button></div></div><div class="chart-container sm" id="chartPriceForecast"></div></div>
+    </div>
+
+    <!-- 锁价策略建议 -->
+    <div class="section-block mt-16">
+      <div class="section-title">锁价策略建议卡 <span class="subtitle">基于AI预测的采购节奏建议</span></div>
+      <div class="grid-3">
+        <div class="strategy-card strategy-warn">
+          <div class="strategy-header"><span>&#128200;</span> 钢材锁价策略</div>
+          <div class="strategy-body">
+            <p><strong>当前状态：</strong>长约覆盖率78.5%，现货采购占比21.5%。我司均价高于市场5.8%。</p>
+            <p><strong>预测：</strong>Q1钢材价格预计<strong class="text-red">上涨3~5%</strong>(基建需求回暖)。</p>
+            <p><strong>建议：</strong>立即启动与宝武/鞍钢的年度长约续签谈判，锁定Q1-Q2供应量。现货部分可考虑在春节前补库。</p>
+            <div class="strategy-tag tag-danger">紧急行动</div>
+          </div>
+        </div>
+        <div class="strategy-card strategy-caution">
+          <div class="strategy-header"><span>&#128202;</span> 塑料粒子锁价策略</div>
+          <div class="strategy-body">
+            <p><strong>当前状态：</strong>长约覆盖率仅35.8%，高度依赖现货市场。库存12.8天接近警戒线。</p>
+            <p><strong>预测：</strong>Q1 PP价格预计<strong class="text-gold">震荡±2%</strong>(原油波动传导)。</p>
+            <p><strong>建议：</strong>优先补充安全库存至20天以上；同时推进与中石化/利安德巴塞尔的框架协议谈判，目标提升长约覆盖至55%。</p>
+            <div class="strategy-tag tag-warning">计划推进</div>
+          </div>
+        </div>
+        <div class="strategy-card strategy-good">
+          <div class="strategy-header"><span>&#9989;</span> MDI锁价策略</div>
+          <div class="strategy-body">
+            <p><strong>当前状态：</strong>长约覆盖率62.4%，采购价低于市场1.8%，议价能力良好。</p>
+            <p><strong>预测：</strong>Q1 MDI价格预计<strong class="text-green">稳中有降1~2%</strong>(产能释放)。</p>
+            <p><strong>建议：</strong>维持现有长约执行节奏，暂无需额外锁价操作。关注万华/巴斯夫季度调价通知。</p>
+            <div class="strategy-tag tag-success">维持现状</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 智能采购节奏 -->
+    <div class="section-block mt-16">
+      <div class="section-title">智能采购节奏建议 <span class="subtitle">不同场景下的最优采购时机模拟</span></div>
+      <div class="card-panel"><div class="chart-container lg" id="chartPurchaseScenario"></div></div>
+    </div>
+  </section><!-- END tab3 -->
+
+  <!-- ============================================================ -->
+  <!-- TAB 4: 需求趋势                                              -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab4">
+    <div class="kpi-row">
+      <div class="kpi-card cyan"><div class="kpi-label">日均消耗量</div><div class="kpi-value">1,334<span class="unit">吨/天</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 6.2% MoM</span></div></div>
+      <div class="kpi-card purple"><div class="kpi-label">库存保有量</div><div class="kpi-value">28,650<span class="unit">吨</span></div><div class="kpi-sub"><span class="kpi-target">可支撑21.5天</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">周转天数</div><div class="kpi-value">21.5<span class="unit">天</span></div><div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; -2.3天 YoY</span><span class="kpi-target">目标:&lt;25天</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">缺料预警数</div><div class="kpi-value">3<span class="unit">个SKU</span></div><div class="kpi-sub"><span class="text-gold">塑料粒子/芯片/轴承</span></div></div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">&#128230;</div>
+      <div class="insight-content">
+        <div class="insight-title">需求趋势 — 库存健康度监控</div>
+        <div class="insight-desc">日均消耗量<strong class="text-cyan">1,334吨/天</strong>(+6.2% MoM)。整体库存可支撑<strong class="text-green">21.5天</strong>，周转天数持续优化(-2.3天)。<strong class="text-red">风险点：</strong>塑料粒子仅12.8天、某型号芯片14.2天、进口轴承18.6天需关注。</div>
+      </div>
+    </div>
+
+    <!-- 消耗vs库存 -->
+    <div class="section-block">
+      <div class="section-title">库存消耗量 vs 保有量走势
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="集团">集团</button><button data-dim="事业部1">事业部1</button><button data-dim="事业部2">事业部2</button><button data-dim="事业部3">事业部3</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartConsumptionInventory"></div></div>
+    </div>
+
+    <!-- 库存健康度 -->
+    <div class="section-block mt-16">
+      <div class="section-title">各品类库存健康度 <span class="subtitle">颜色编码：绿=安全 / 黄=警戒 / 红=缺货</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container" id="chartInventoryHealth"></div></div>
+    </div>
+
+    <!-- 未来4周需求预测 -->
+    <div class="section-block mt-16">
+      <div class="section-title">未来4周需求预测 <span class="subtitle">基于历史消耗 + 生产排产计划</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="集团">集团</button><button data-dim="事业部1">事业部1</button><button data-dim="事业部2">事业部2</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartDemandForecast"></div></div>
+    </div>
+  </section><!-- END tab4 -->
+
+
+  <!-- ============================================================ -->
+  <!-- TAB 5: 材料成本率                                            -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab5">
+    <div class="kpi-row">
+      <div class="kpi-card cyan"><div class="kpi-label">整体材料成本率</div><div class="kpi-value">68.4<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; -0.8pp YoY</span><span class="kpi-target">目标:&lt;70%</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">集团销售额</div><div class="kpi-value">71.16<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 12.1% YoY</span></div></div>
+      <div class="kpi-card purple"><div class="kpi-label">材料成本总额</div><div class="kpi-value">48.67<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">环比变动</div><div class="kpi-value">-0.8<span class="unit">pp</span></div><div class="kpi-sub"><span class="text-green">持续优化中</span></div></div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">&#128176;</div>
+      <div class="insight-content">
+        <div class="insight-title">材料成本率 — 成本结构优化追踪</div>
+        <div class="insight-desc">整体材料成本率<strong class="text-green">68.4%</strong>(目标&lt;70%)，同比<strong class="text-green">-0.8pp</strong>。销售额增速(+12.1%)快于材料成本增速(+8.3%)，规模效应显现。<strong class="text-gold">关注：</strong>事业部3成本率72.8%(高于集团均值)，需重点优化。</div>
+      </div>
+    </div>
+
+    <!-- 明细表 -->
+    <div class="section-block">
+      <div class="section-title">材料成本率明细
+        <div style="margin-left:auto;display:flex;gap:12px;">
+          <div class="dim-toggle"><button class="active" data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button><button data-dim="按产品线">按产品线</button><button data-dim="按材料大类">按材料大类</button></div>
+          <div class="time-toggle"><button class="active">2025年</button><button>2024年</button></div>
+        </div>
+      </div>
+      <div class="card-panel" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr><th>组织/维度</th><th>销售额(亿)</th><th>材料成本(亿)</th><th>成本率</th><th>环比</th><th>同比</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td><strong>集团合计</strong></td><td class="text-mono text-cyan">71.16</td><td class="text-mono text-cyan">48.67</td><td class="text-green text-mono"><strong>68.4%</strong></td><td class="text-green">-0.2pp</td><td class="text-green">-0.8pp</td><td><span class="tag tag-success">达标</span></td></tr>
+            <tr><td>事业部1</td><td class="text-mono">28.46</td><td class="text-mono">18.92</td><td class="text-green text-mono">66.5%</td><td class="text-green">-0.3pp</td><td class="text-green">-1.1pp</td><td><span class="tag tag-success">优秀</span></td></tr>
+            <tr><td>事业部2</td><td class="text-mono">22.15</td><td class="text-mono">15.36</td><td class="text-gold text-mono">69.3%</td><td>-0.1pp</td><td class="text-green">-0.5pp</td><td><span class="tag tag-warning">接近</span></td></tr>
+            <tr><td>事业部3</td><td class="text-mono">14.32</td><td class="text-mono">10.43</td><td class="text-red text-mono"><strong>72.8%</strong></td><td class="text-red">+0.4pp</td><td>+0.2pp</td><td><span class="tag tag-danger">超标</span></td></tr>
+            <tr><td>事业部4</td><td class="text-mono">6.23</td><td class="text-mono">3.96</td><td class="text-green text-mono">63.6%</td><td class="text-green">-0.6pp</td><td class="text-green">-1.8pp</td><td><span class="tag tag-success">优秀</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 趋势 + 对比 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128200;</span>材料成本率趋势(多维度对比)</div><div class="time-toggle"><button class="active">年度</button><button>季度</button></div></div><div class="chart-container sm" id="chartMaterialCostRate"></div></div>
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#127981;</span>各事业部成本率对比</div><div class="dim-toggle"><button class="active" data-dim="2025年">2025年</button><button data-dim="2024年">2024年</button></div></div><div class="chart-container sm" id="chartBuCostRate"></div></div>
+    </div>
+  </section><!-- END tab5 -->
+
+  <!-- ============================================================ -->
+  <!-- TAB 6: 其他降本机会                                          -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab6">
+    <div class="kpi-row">
+      <div class="kpi-card gold"><div class="kpi-label">小额分散供应商数</div><div class="kpi-value">186<span class="unit">家</span></div><div class="kpi-sub"><span class="kpi-target">年采购额&lt;50万/家</span></div></div>
+      <div class="kpi-card red"><div class="kpi-label">分散采购金额</div><div class="kpi-value">4,280<span class="unit">万元</span></div><div class="kpi-sub"><span class="kpi-target">占总支出0.88%</span></div></div>
+      <div class="kpi-card purple"><div class="kpi-label">长尾占比</div><div class="kpi-value">0.88<span class="unit">%</span></div><div <div class="kpi-sub"><span class="kpi-target">目标:&lt;1%</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">整合机会预估</div><div class="kpi-value">850~1,200<span class="unit">万元</span></div><div class="kpi-sub"><span class="kpi-target">集采+归一化</span></div></div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">&#128161;</div>
+      <div class="insight-content">
+        <div class="insight-title">长尾供应商整合 — 隐藏的降本机会</div>
+        <div class="insight-desc">发现<strong class="text-gold">186家</strong>小额分散供应商（年采购额&lt;50万），总金额<strong class="text-cyan">4,280万</strong>。通过<strong class="text-green">品类归一化+区域集采+框架协议</strong>，预计可释放<strong class="text-cyan">850~1,200万</strong>降本空间。</div>
+      </div>
+    </div>
+
+    <!-- Top15清单 -->
+    <div class="section-block">
+      <div class="section-title">长尾供应商整合清单 Top15
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div>
+      </div>
+      <div class="card-panel" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>品类</th><th>分散供应商数</th><th>分散金额(万)</th><th>整合方案</th><th>预计节约(万)</th><th>优先级</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>MRO物料</td><td class="text-mono">42</td><td class="text-mono text-cyan">1,240</td><td>区域集采平台</td><td class="text-green text-mono">320</td><td><span class="badge badge-high">P0</span></td></tr>
+            <tr><td>2</td><td>包装材料</td><td class="text-mono">28</td><td class="text-mono text-cyan">860</td><td>标准化+集采</td><td class="text-green text-mono">180</td><td><span class="badge badge-high">P0</span></td></tr>
+            <tr><td>3</td><td>通用备件</td><td class="text-mono">35</td><td class="text-mono text-cyan">720</td><td>品牌归一化</td><td class="text-green text-mono">150</td><td><span class="badge badge-mid">P1</span></td></tr>
+            <tr><td>4</td><td>IT设备</td><td class="text-mono">18</td><td class="text-mono text-cyan">480</td><td>统一租赁模式</td><td class="text-green text-mono">95</td><td><span class="badge badge-mid">P1</span></td></tr>
+            <tr><td>5</td><td>劳保用品</td><td class="text-mono">22</td><td class="text-mono text-cyan">340</td><td>电商集采</td><td class="text-green text-mono">68</td><td><span class="badge badge-ok">P2</span></td></tr>
+            <tr><td>6</td><td>办公耗材</td><td class="text-mono">15</td><td class="text-mono text-cyan">260</td><td>电商集采</td><td class="text-green text-mono">52</td><td><span class="badge badge-ok">P2</span></td></tr>
+            <tr><td>7</td><td>物流服务</td><td class="text-mono">12</td><td class="text-mono text-cyan">210</td><td>干线整合</td><td class="text-green text-mono">42</td><td><span class="badge badge-ok">P2</span></td></tr>
+            <tr><td>8</td><td>检测服务</td><td class="text-mono">8</td><td class="text-mono text-cyan">95</td><td>框架协议</td><td class="text-green text-mono">19</td><td><span class="badge badge-ok">P2</span></td></tr>
+            <tr><td>9</td><td>清洁服务</td><td class="text-mono">6</td><td class="text-mono text-cyan">75</td><td>外包整合</td><td class="text-green text-mono">15</td><td><span class="badge badge-ok">P2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 图表 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#128200;</span>按品类分散供应商分析</div><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button></div></div><div class="chart-container sm" id="chartSmallSuppliersCat"></div></div>
+      <div class="card-panel"><div class="card-header"><div class="card-title"><span class="icon">&#129307;</span>按事业部分散供应商雷达图</div></div><div class="chart-container sm" id="chartSmallSuppliersBu"></div></div>
+    </div>
+  </section><!-- END tab6 -->
+
+  <!-- ============================================================ -->
+  <!-- TAB 7: 供应源分析                                            -->
+  <!-- ============================================================ -->
+  <section class="module-section" id="tab7">
+    <div class="kpi-row">
+      <div class="kpi-card cyan"><div class="kpi-label">供应商总数</div><div class="kpi-value">486<span class="unit">家</span></div><div class="kpi-sub"><span class="kpi-target">核心:128家 战略:42家</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">平均绩效得分</div><div class="kpi-value">82.6<span class="unit">分</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +2.3分 YoY</span><span class="kpi-target">目标基准:80分</span></div></div>
+      <div class="kpi-card gold"><div class="kpi-label">交付及时率</div><div class="kpi-value">94.2<span class="unit">%</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +1.8pp YoY</span><span class="kpi-target">目标:95%</span></div></div>
+      <div class="kpi-card red"><div class="kpi-label">单一供应风险SKU</div><div class="kpi-value">34<span class="unit">个</span></div><div class="kpi-sub"><span class="text-gold">高危(>500万):8个</span></div></div>
+      <div class="kpi-card purple"><div class="kpi-label">合规度评分</div><div class="kpi-value">91.3<span class="unit">分</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +3.1分 YoY</span><span class="kpi-target">目标:90分</span></div></div>
+      <div class="kpi-card cyan"><div class="kpi-label">新引入供应商</div><div class="kpi-value">18<span class="unit">家</span></div><div class="kpi-sub"><span class="kpi-target">Q4新增:6家</span></div></div>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-icon">&#129307;</div>
+      <div class="insight-content">
+        <div class="insight-title">供应源分析 — 绩效评估与风险识别</div>
+        <div class="insight-desc">供应商平均绩效<strong class="text-green">82.6分</strong>(+2.3分 YoY)，交付及时率<strong class="text-gold">94.2%</strong>(距95%目标差0.8pp)。<strong class="text-red">风险：</strong>34个SKU为独家供应(高危8个)；利安德巴塞尔交付率降至87.2%；需加速二供开发。</div>
+      </div>
+    </div>
+
+    <!-- 绩效雷达 -->
+    <div class="section-block">
+      <div class="section-title">供应商综合绩效雷达图 <span class="subtitle">当前得分 vs 目标基准 vs 行业Top10%</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="集团">集团</button><button data-dim="事业部1">事业部1</button><button data-dim="事业部2">事业部2</button><button data-dim="事业部3">事业部3</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartSupplierRadar"></div></div>
+    </div>
+
+    <!-- 绩效指标卡片 -->
+    <div class="grid-4 mt-16">
+      <div class="metric-card metric-good"><div class="metric-value">82.6</div><div class="metric-label">综合绩效<br/><small style="color:var(--text-muted);font-weight:400;">目标80 | 行业Top10%=90</small></div></div>
+      <div class="metric-card metric-warn"><div class="metric-value">94.2%</div><div class="metric-label">交付及时率<br/><small style="color:var(--text-muted);font-weight:400;">目标95% | 差距-0.8pp</small></div></div>
+      <div class="metric-card metric-good"><div class="metric-value">96.8%</div><div class="metric-label">质量合格率<br/><small style="color:var(--text-muted);font-weight:400;">目标96% | 超标+0.8pp</small></div></div>
+      <div class="metric-card metric-warn"><div class="metric-value">89.4%</div><div class="metric-label">价格竞争力<br/><small style="color:var(--text-muted);font-weight:400;">目标90% | 差距-0.6pp</small></div></div>
+    </div>
+
+    <!-- 支出绩效匹配 -->
+    <div class="section-block mt-16">
+      <div class="section-title">支出-绩效匹配度分析 <span class="subtitle">高支出是否匹配高绩效？</span>
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="按品类">按品类</button><button data-dim="按事业部">按事业部</button><button data-dim="按子公司">按子公司</button></div></div>
+      </div>
+      <div class="card-panel"><div class="chart-container lg" id="chartSpendPerfMatch"></div></div>
+    </div>
+
+    <!-- 风险表格 -->
+    <div class="grid-2 mt-16">
+      <div class="card-panel">
+        <div class="card-header"><div class="card-title"><span class="icon text-red">&#9888;</span>供应商过多物料 (&gt;5家) — 整合机会</div></div>
+        <table class="data-table compact">
+          <thead><tr><th>物料名称</th><th>品类</th><th>供应商数</th><th>年采购额</th><th>建议</th></tr></thead>
+          <tbody>
+            <tr><td>普通螺栓M8-M20</td><td>紧固件</td><td class="text-mono">12</td><td class="text-mono text-cyan">420万</td><td>归一至3家</td></tr>
+            <tr><td>标准垫片系列</td><td>紧固件</td><td class="text-mono">9</td><td class="text-mono text-cyan">280万</td><td>归一至2家</td></tr>
+            <tr><td>工业润滑油</td><td>MRO</td><td class="text-mono">8</td><td class="text-mono text-cyan">195万</td><td>品牌统一</td></tr>
+            <tr><td>PVC管材</td><td>建材</td><td class="text-mono">7</td><td class="text-mono text-cyan">160万</td><td>区域集采</td></tr>
+            <tr><td>普通电缆</td><td>电气</td><td class="text-mono">6</td><td class="text-mono text-cyan">140万</td><td>规格合并</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-panel">
+        <div class="card-header"><div class="card-title"><span class="icon text-red">&#128308;</span>单一供应风险物料清单</div></div>
+        <table class="data-table compact">
+          <thead><tr><th>物料名称</th><th>品类</th><th>年采购额</th><th>唯一供应商</th><th>风险等级</th></tr></thead>
+          <tbody>
+            <tr><td>动力电池模组</td><td>电池</td><td class="text-mono text-cyan">8,600万</td><td>宁德时代</td><td><span class="badge badge-high">高</span></td></tr>
+            <tr><td>IGBT芯片</td><td>电子</td><td class="text-mono text-cyan">4,200万</td><td>英飞凌</td><td><span class="badge badge-high">高</span></td></tr>
+            <tr><td>高端轴承</td><td>机械</td><td class="text-mono text-cyan">2,800万</td><td>SKF</td><td><span class="badge badge-high">高</span></td></tr>
+            <tr><td>MDI原料</td><td>化工</td><td class="text-mono text-cyan">2,100万</td><td>万华化学</td><td><span class="badge badge-mid">中</span></td></tr>
+            <tr><td>PP改性料</td><td>塑料</td><td class="text-mono text-cyan">1,600万</td><td>利安德巴塞尔</td><td><span class="badge badge-mid">中</span></td></tr>
+            <tr><td>特种橡胶密封件</td><td>橡胶</td><td class="text-mono text-cyan">920万</td><td>NOK</td><td><span class="badge badge-mid">中</span></td></tr>
+            <tr><td>铝合金型材</td><td>金属</td><td class="text-mono text-cyan">680万</td><td>南山铝业</td><td><span class="badge badge-ok">低</span></td></tr>
+            <tr><td>PCB板</td><td>电子</td><td class="text-mono text-cyan">450万</td><td>深南电路</td><td><span class="badge badge-ok">低</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 行业排名 -->
+    <div class="section-block mt-16">
+      <div class="section-title">核心品类供应商行业排名 & 市占率
+        <div style="margin-left:auto;"><div class="dim-toggle"><button class="active" data-dim="钢材">钢材</button><button data-dim="化工">化工</button><button data-dim="塑料">塑料</button><button data-dim="电子">电子</button></div></div>
+      </div>
+      <div class="card-panel" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr><th>排名</th><th>供应商名称</th><th>行业地位</th><th>我司采购额(亿)</th><th>市占率</th><th>绩效</th><th>合作年限</th></tr></thead>
+          <tbody>
+            <tr><td class="rank-num rank-1-text">1</td><td>宝武钢铁</td><td>全球Top1</td><td class="text-mono text-cyan">6.82</td><td class="text-green">79.1%</td><td class="text-green">88分</td><td>15年</td></tr>
+            <tr><td class="rank-num rank-2-text">2</td><td>鞍钢股份</td><td>国内Top3</td><td class="text-mono text-cyan">1.56</td><td>18.1%</td><td class="text-green">85分</td><td>12年</td></tr>
+            <tr><td class="rank-num rank-3-text">3</td><td>首钢集团</td><td>国内Top5</td><td class="text-mono text-cyan">0.24</td><td>2.8%</td><td class="text-gold">81分</td><td>5年</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section><!-- END tab7 -->
+
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script type="module">
+import { createDashboardStateBus, createInitialDashboardState } from './assets/js/ai/state-bus.js';
+import { createContextBridge } from './assets/js/ai/context-bridge.js';
+import { bootAssistantShell, createProxyMessageSender } from './assets/js/ai/assistant-shell.js';
+import { createAiPrivacyGate } from './assets/js/ai/privacy-gate.js';
+
+(function() {
+  'use strict';
+
+  /* ================================================================
+     PART 0: 工具函数 & 常量
+     ================================================================ */
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  function updateTime() {
+    const now = new Date();
+    const el = $('#headerTime');
+    if (el) el.textContent = now.toLocaleString('zh-CN', {
+      year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+  }
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  /* ================================================================
+     PART 1: Tab 切换系统 (稳定化)
+     ================================================================ */
+  const TAB_MAP = {
+    tabHome:  { charts: [] },
+    tab1:     { charts: ['chartMonthlySavings','chartBuSavings','chartSubSavings','chartMroSavings','chartItSavings','chartLogisticsSavings','chartProcureAmount','chartSavingRatio','chartForecastAmount','chartForecastYoy','chartForecastRatio'] },
+    tab2:     { charts: ['chartCoreSpend','chartPriceDeviation','chartPriceTrendCompare','chartInventorySpend','chartVMI','chartSupplierConc','chartTCOCategory','chartTCOBu','chartTCOSubsidiary','chartLongContract'] },
+    tab3:     { charts: ['chartMarketPriceTrend','chartFuturesPrice','chartMacroIndicators','chartProcureVsMarket','chartInventoryLevel','chartPriceForecast','chartPurchaseScenario'] },
+    tab4:     { charts: ['chartConsumptionInventory','chartInventoryHealth','chartDemandForecast'] },
+    tab5:     { charts: ['chartMaterialCostRate','chartBuCostRate'] },
+    tab6:     { charts: ['chartSmallSuppliersCat','chartSmallSuppliersBu'] },
+    tab7:     { charts: ['chartSupplierRadar','chartSpendPerfMatch'] }
+  };
+
+  const TAB_LABELS = {
+    tabHome: '首页驾驶舱',
+    tab1: '降本分析',
+    tab2: '支出分析',
+    tab3: '价格趋势分析',
+    tab4: '需求趋势分析',
+    tab5: '材料成本率',
+    tab6: '其他降本机会',
+    tab7: '供应源分析'
+  };
+
+  let _activeTab = 'tabHome';
+  const dashboardStateBus = createDashboardStateBus({
+    initialState: createInitialDashboardState({
+      session: {
+        userRole: 'procurement_manager',
+        dateRange: '2026-W15'
+      },
+      ui: {
+        activeTab: _activeTab,
+        activeModule: TAB_LABELS[_activeTab]
+      }
+    })
+  });
+  const aiContextBridge = createContextBridge({
+    stateBus: dashboardStateBus,
+    resolveModuleName: (tabId) => TAB_LABELS[tabId] || TAB_LABELS.tabHome,
+    getChartDimension: (chartId) => _dimState[chartId] || null
+  });
+  let assistantShell = null;
+
+  function switchTab(tabId) {
+    // 更新按钮状态
+    $$('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+
+    // 隐藏所有section
+    $$('.module-section').forEach(sec => sec.classList.remove('active'));
+
+    // 显示目标section
+    const target = $(`#${tabId}`);
+    if (!target) return;
+    target.classList.add('active');
+    _activeTab = tabId;
+    aiContextBridge.syncTab(tabId);
+
+    // 延迟resize当前tab的图表(等待DOM渲染完成)
+    requestAnimationFrame(() => {
+      const chartIds = TAB_MAP[tabId] ? TAB_MAP[tabId].charts : [];
+      chartIds.forEach(id => {
+        if (chartInstances[id]) {
+          try { chartInstances[id].resize(); } catch(e) {}
+        }
+      });
+      // 也resize首页所有图表
+      if (tabId === 'tabHome') {
+        Object.keys(chartInstances).forEach(id => {
+          try { chartInstances[id].resize(); } catch(e) {}
+        });
+      }
+    });
+
+    // 关闭可能打开的弹窗/AI面板
+    closeModal();
+  }
+
+  window.switchTab = switchTab;
+
+  $$('#mainTabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  /* ================================================================
+     PART 2: 维度切换数据骨架 (可扩展)
+     
+     架构说明:
+     - DIM_DATA: 三维数据映射表 { 图表ID: { 维度名: { seriesData, yAxisData, ... } } }
+     - DIM_CHART_CONFIG: 每个支持维度切换的图表的配置生成函数
+     - 注册新图表只需在 DIM_DATA 中添加数据，在 DIM_CHART_CONFIG 中添加配置函数
+     - 默认维度: "集团"
+     ================================================================ */
+
+  // ---- 维度名称映射 ----
+  const DIM_LABELS = {
+    '集团': '集团',
+    '事业部1': '事业部1', '事业部2': '事业部2', '事业部3': '事业部3', '事业部4': '事业部4',
+    '子公司1': '子公司1', '子公司2': '子公司2', '子公司3': '子公司3', '子公司4': '子公司4', '子公司5': '子公司5',
+    '按品类': '按品类', '热轧卷板': '热轧卷板', 'PP拉丝': 'PP拉丝', 'MDI': 'MDI'
+  };
+
+  // ---- 颜色体系 ----
+  const COLORS = {
+    cyan: '#38bdf8', gold: '#f59e0b', green: '#10b981', red: '#ef4444',
+    purple: '#a78bfa', blue: '#3b82f6', orange: '#f97316', teal: '#14b8a6', pink: '#ec4899', indigo: '#6366f1'
+  };
+  const COLOR_ARRAY = [COLORS.cyan, COLORS.gold, COLORS.green, COLORS.purple, COLORS.red, COLORS.blue, COLORS.orange, COLORS.teal];
+
+  // ---- 核心维度数据集 ----
+  // 数据常量 (提前声明，供DIM_DATA引用，避免TDZ错误)
+  const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const BUs = ['事业部1','事业部2','事业部3','事业部4'];
+  const SUBS = ['子公司1','子公司2','子公司3','子公司4','子公司5'];
+  const CATEGORIES = ['钢材','化工原料','塑料粒子','电子元器件','包装材料','动力能源','通用备件'];
+
+  const DIM_DATA = {
+
+    // ===== M1-1: 月度降本追踪 =====
+    'chartMonthlySavings': {
+      '集团': {
+        actual: [2100,1850,2340,2080,2560,2720,2890,3010,3150,3260,3380,3200],
+        budget: [2500,2400,2600,2550,2700,2800,2900,3000,3100,3200,3300,3400],
+        rate:   [84.0,77.1,90.0,81.6,94.8,97.1,99.7,100.3,101.6,101.9,102.5,94.1]
+      },
+      '事业部1': {
+        actual: [820,740,920,850,1020,1100,1160,1220,1280,1340,1380,1320],
+        budget: [900,880,950,920,1000,1080,1140,1200,1240,1300,1350,1360],
+        rate:   [91.1,84.1,96.8,92.4,102.0,101.9,101.8,101.7,103.2,103.1,102.2,97.1]
+      },
+      '事业部2': {
+        actual: [680,620,780,720,860,920,970,1010,1050,1090,1130,1080],
+        budget: [780,760,820,800,860,920,970,1020,1060,1100,1140,1150],
+        rate:   [87.2,81.6,95.1,90.0,100.0,100.0,100.0,99.0,99.1,99.1,99.1,93.9]
+      },
+      '事业部3': {
+        actual: [420,380,480,420,520,560,590,620,650,680,700,680],
+        budget: [500,480,520,500,540,580,610,640,670,700,720,720],
+        rate:   [84.0,79.2,92.3,84.0,96.3,96.6,96.7,96.9,97.0,97.1,97.2,94.4]
+      }
+    },
+
+    // ===== M1-2: 事业部降本对比 =====
+    'chartBuSavings': {
+      '集团':       { actual:[8620,7240,6830,5710], target:[8000,7500,7200,6500], labels:['事业部1','事业部2','事业部3','事业部4'] },
+      '按品类':     { actual:[8620,6340,4180,3560,2240,2100,1360], target:[8000,7200,5800,4000,2500,2000,1500], labels:CATEGORIES },
+      '按子公司':   { actual:[7640,6320,5860,4920,3720], target:[8000,6800,6000,5200,4000], labels:SUBS }
+    },
+
+    // ===== M1-3: 子公司降本对比 =====
+    'chartSubSavings': {
+      '集团':       { actual:[7640,6320,5860,4920,3720], target:[8000,6800,6000,5200,4000], labels:SUBS },
+      '按品类':     { actual:[8620,6340,4180,3560,2240,2100,1360], target:[8000,7200,5800,4000,2500,2000,1500], labels:CATEGORIES },
+      '按事业部':   { actual:[8620,7240,6830,5710], target:[8000,7500,7200,6500], labels:BUs }
+    },
+
+    // ===== M2-1: 核心品类支出 Treemap =====
+    'chartCoreSpend': {
+      '按品类': [
+        {name:'钢材\n8.62亿(17.7%)', value:8.62, itemStyle:{color:'#38bdf8'}},
+        {name:'化工原料\n7.24亿(14.9%)', value:7.24, itemStyle:{color:'#f59e0b'}},
+        {name:'塑料粒子\n5.86亿(12.0%)', value:5.86, itemStyle:{color:'#10b981'}},
+        {name:'钢材-其他\n5.42亿(11.1%)', value:5.42, itemStyle:{color:'#a78bfa'}},
+        {name:'化工-其他\n4.18亿(8.6%)', value:4.18, itemStyle:{color:'#ef4444'}},
+        {name:'电子元件\n3.64亿(7.5%)', value:3.64, itemStyle:{color:'#3b82f6'}},
+        {name:'塑料-其他\n3.28亿(6.7%)', value:3.28, itemStyle:{color:'#f97316'}},
+        {name:'包装材料\n2.24亿(4.6%)', value:2.24, itemStyle:{color:'#14b8a6'}},
+        {name:'动力能源\n2.10亿(4.3%)', value:2.10, itemStyle:{color:'#ec4899'}},
+        {name:'其他品类\n8.09亿(16.6%)', value:8.09, itemStyle:{color:'rgba(148,163,184,0.25)'}}
+      ],
+      '按事业部': [
+        {name:'事业部1\n18.92亿(38.9%)', value:18.92, itemStyle:{color:'#38bdf8'}},
+        {name:'事业部2\n15.36亿(31.6%)', value:15.36, itemStyle:{color:'#f59e0b'}},
+        {name:'事业部3\n10.43亿(21.4%)', value:10.43, itemStyle:{color:'#10b981'}},
+        {name:'事业部4\n3.96亿(8.1%)', value:3.96, itemStyle:{color:'#a78bfa'}}
+      ],
+      '按子公司': [
+        {name:'子公司1\n14.22亿(29.2%)', value:14.22, itemStyle:{color:'#38bdf8'}},
+        {name:'子公司2\n11.06亿(22.7%)', value:11.06, itemStyle:{color:'#f59e0b'}},
+        {name:'子公司3\n9.54亿(19.6%)', value:9.54, itemStyle:{color:'#10b981'}},
+        {name:'子公司4\n8.34亿(17.1%)', value:8.34, itemStyle:{color:'#a78bfa'}},
+        {name:'子公司5\n5.51亿(11.3%)', value:5.51, itemStyle:{color:'#f97316'}}
+      ]
+    },
+
+    // ===== M2-2: 价格偏差度 =====
+    'chartPriceDeviation': {
+      '按品类':     { values:[5.8,3.5,3.0,-1.8,2.2,-2.5,1.5], labels:CATEGORIES },
+      '按事业部':   { values:[4.2,3.8,5.5,1.2], labels:BUs },
+      '按子公司':   { values:[3.5,4.0,2.8,3.2,1.8], labels:SUBS }
+    },
+
+    // ===== M2-5: VMI覆盖率 =====
+    'chartVMI': {
+      '按品类':     { vmi:[45,28,22,15,38], nonVmi:[55,72,78,85,62], labels:CATEGORIES.slice(0,5) },
+      '按事业部':   { vmi:[42,30,25,50], nonVmi:[58,70,75,50], labels:BUs },
+      '按子公司':   { vmi:[38,32,28,35,40], nonVmi:[62,68,72,65,60], labels:SUBS.slice(0,5) }
+    },
+
+    // ===== M2-7~9: TCO饼图 =====
+    'chartTCOCategory': {
+      '按品类': [{name:'材料成本',value:42.86,color:COLORS.cyan},{name:'物流运输',value:3.52,color:COLORS.gold},{name:'仓储管理',value:0.84,color:COLORS.green},{name:'关税税费',value:1.02,color:COLORS.purple},{name:'其他',value:0.43,color:'rgba(148,163,184,0.3)'}],
+      '按事业部': [{name:'事业部1',value:18.92,color:COLORS.cyan},{name:'事业部2',value:15.36,color:COLORS.gold},{name:'事业部3',value:10.43,color:COLORS.green},{name:'事业部4',value:3.96,color:COLORS.purple}],
+      '按子公司': [{name:'子公司1',value:14.22,color:COLORS.cyan},{name:'子公司2',value:11.06,color:COLORS.gold},{name:'子公司3',value:9.54,color:COLORS.green},{name:'子公司4',value:8.34,color:COLORS.purple},{name:'子公司5',value:5.51,color:COLORS.blue}]
+    },
+
+    // ===== M3-1: 市场价格趋势 =====
+    'chartMarketPriceTrend': {
+      '热轧卷板': { line1:[3560,3420,3680,3540,3760,3820,3750,3667,3600,3667,3700,3667], name1:'热轧卷板(元/吨)', color1:COLORS.cyan,
+                     line2:[7420,7280,7560,7480,7720,7850,7780,7620,7520,7620,7700,7620], name2:'PP拉丝(元/吨)', color2:COLORS.gold,
+                     line3:[17200,16850,17500,17100,17800,17620,17400,17100,16900,17100,17300,17100], name3:'MDI(元/吨)', color3:COLORS.green },
+      'PP拉丝':  { line1:[7420,7280,7560,7480,7720,7850,7780,7620,7520,7620,7700,7620], name1:'PP拉丝(元/吨)', color1:COLORS.gold,
+                     line2:[3560,3420,3680,3540,3760,3820,3750,3667,3600,3667,3700,3667], name2:'热轧卷板(元/吨)', color2:COLORS.cyan,
+                     line3:[17200,16850,17500,17100,17800,17620,17400,17100,16900,17100,17300,17100], name3:'MDI(元/吨)', color3:COLORS.green },
+      'MDI':     { line1:[17200,16850,17500,17100,17800,17620,17400,17100,16900,17100,17300,17100], name1:'MDI(元/吨)', color1:COLORS.green,
+                     line2:[3560,3420,3680,3540,3760,3820,3750,3667,3600,3667,3700,3667], name2:'热轧卷板(元/吨)', color2:COLORS.cyan,
+                     line3:[7420,7280,7560,7480,7720,7850,7780,7620,7520,7620,7700,7620], name3:'PP拉丝(元/吨)', color3:COLORS.gold }
+    },
+
+    // ===== M4-1: 库存消耗vs保有量 =====
+    'chartConsumptionInventory': {
+      '集团':     { consume:[1180,1120,1280,1220,1350,1400,1380,1340,1320,1334,1360,1320], inventory:[30.2,29.5,31.8,30.5,32.2,33.0,32.8,31.5,30.8,28.65,28.9,28.7] },
+      '事业部1': { consume:[480,450,520,490,550,580,560,540,530,540,555,535], inventory:[12.5,12.0,13.2,12.6,13.5,14.0,13.7,13.2,12.8,12.0,12.2,12.0] },
+      '事业部2': { consume:[380,350,410,380,430,460,445,425,415,422,438,422], inventory:[10.2,9.8,10.8,10.3,11.0,11.5,11.2,10.8,10.5,9.8,10.0,9.8] },
+      '事业部3': { consume:[240,220,260,240,270,290,280,265,260,268,278,268], inventory:[6.2,5.9,6.6,6.2,6.9,7.3,7.1,6.7,6.5,6.0,6.2,6.0] }
+    },
+
+    // ===== M4-2: 库存健康度 =====
+    'chartInventoryHealth': {
+      '按品类':     { values:[28.5,22.3,12.8,14.2,25.6,18.4,19.8], labels:CATEGORIES, status:['safe','safe','danger','warn','safe','warn','safe'] },
+      '按事业部':   { values:[24.2,19.8,15.5,21.3], labels:BUs, status:['safe','warn','warn','safe'] },
+      '按子公司':   { values:[26.1,21.5,17.8,23.2,19.0], labels:SUBS, status:['safe','safe','warn','safe','warn'] }
+    },
+
+    // ===== M5-1: 材料成本率趋势 =====
+    'chartMaterialCostRate': {
+      '集团':     { l1:[69.2,68.8,69.0,68.6,68.8,68.5,68.6,68.4,68.3,68.4,68.5,68.4], n1:'集团整体', c1:COLORS.cyan,
+                   l2:[67.0,66.8,66.9,66.5,66.7,66.4,66.5,66.3,66.2,66.5,66.6,66.5], n2:'事业部1', c2:COLORS.green,
+                   l3:[69.8,69.5,69.6,69.3,69.5,69.2,69.3,69.1,69.0,69.3,69.4,69.3], n3:'事业部2', c3:COLORS.gold,
+                   l4:[72.4,72.2,72.3,72.0,72.2,72.8,73.0,72.8,72.6,72.8,72.9,72.8], n4:'事业部3', c4:COLORS.red },
+      '按事业部': { l1:[67.0,66.8,66.9,66.5,66.7,66.4,66.5,66.3,66.2,66.5,66.6,66.5], n1:'事业部1', c1:COLORS.cyan,
+                   l2:[69.8,69.5,69.6,69.3,69.5,69.2,69.3,69.1,69.0,69.3,69.4,69.3], n2:'事业部2', c2:COLORS.gold,
+                   l3:[72.4,72.2,72.3,72.0,72.2,72.8,73.0,72.8,72.6,72.8,72.9,72.8], n3:'事业部3', c3:COLORS.red,
+                   l4:[63.6,63.4,63.5,63.2,63.4,63.0,63.1,62.9,62.8,63.6,63.7,63.6], n4:'事业部4', c4:COLORS.green }
+    },
+
+    // ===== M5-2: BU成本率对比 =====
+    'chartBuCostRate': {
+      '2025年': { values:[66.5,69.3,72.8,63.6], labels:BUs },
+      '2024年': { values:[67.3,70.1,74.2,64.8], labels:BUs }
+    },
+
+    // ===== M7-1: 供应商绩效雷达 =====
+    'chartSupplierRadar': {
+      '集团':     { current:[94.2,96.8,89.4,85.2,78.6,91.3], target:[95,96,90,88,82,92], top10:[98,99,95,94,90,97] },
+      '事业部1': { current:[95.2,97.5,90.4,86.5,80.3,92.1], target:[96,97,91,89,83,93], top10:[98,99,96,95,91,98] },
+      '事业部2': { current:[93.5,96.2,88.6,84.0,77.5,90.5], target:[95,96,90,88,82,92], top10:[98,99,95,94,90,97] },
+      '事业部3': { current:[91.8,95.5,87.0,82.5,75.0,89.5], target:[94,95,89,87,81,91], top10:[97,98,94,93,89,96] }
+    },
+
+    // ===== M7-2: 支出绩效匹配 =====
+    'chartSpendPerfMatch': {
+      '按品类':     { barData:[8.62,7.24,5.86,5.42,4.18,3.64,3.28,2.24,2.10], scatterData:[[8.62,88],[7.24,85],[5.86,78],[5.42,86],[4.18,82],[3.64,80],[3.28,76],[2.24,84],[2.10,90]], labels:CATEGORIES },
+      '按事业部':   { barData:[18.92,15.36,10.43,3.96], scatterData:[[18.92,88],[15.36,85],[10.43,78],[3.96,82]], labels:BUs },
+      '按子公司':   { barData:[14.22,11.06,9.54,8.34,5.51], scatterData:[[14.22,86],[11.06,83],[9.54,80],[8.34,79],[5.51,84]], labels:SUBS }
+    }
+
+  }; // END DIM_DATA
+
+  // ---- 当前各图表的活跃维度 ----
+  const _dimState = {}; // { chartId: '当前维度' }
+
+  // ---- 维度切换核心函数 ----
+  function applyDimension(chartId, dimName) {
+    const data = DIM_DATA[chartId];
+    if (!data || !data[dimName]) {
+      console.warn(`[维度切换] ${chartId} 无 ${dimName} 数据`);
+      return;
+    }
+    _dimState[chartId] = dimName;
+    aiContextBridge.syncDimension({ chartId, dimName });
+
+    const chart = chartInstances[chartId];
+    if (!chart) return;
+
+    const d = data[dimName];
+
+    // 根据图表类型分发处理
+    switch(chartId) {
+
+      case 'chartMonthlySavings':
+        chart.setOption({
+          series: [
+            { data: d.actual },
+            { data: d.budget },
+            { data: d.rate }
+          ]
+        }, { notMerge: false });
+        break;
+
+      case 'chartBuSavings':
+      case 'chartSubSavings':
+        chart.setOption({
+          yAxis: { data: d.labels },
+          series: [
+            { data: d.actual },
+            { data: d.target }
+          ]
+        }, { notMerge: false });
+        break;
+
+      case 'chartCoreSavings':
+        chart.setOption({ series: [{ data: d }] }, { notMerge: false });
+        break;
+
+      case 'chartCoreSpend':
+        chart.setOption({ series: [{ data: d }] }, { notMerge: false });
+        break;
+
+      case 'chartPriceDeviation':
+        const devData = d.values.map((v,i) => {
+          let c = COLORS.green;
+          if (Math.abs(v) > 5) c = COLORS.red;
+          else if (Math.abs(v) > 3) c = COLORS.gold;
+          return { value:v, itemStyle:{color:c}, label:{show:true, position:v>=0?'right':'left', formatter:`${v}%`, color:c, fontSize:11, fontWeight:600} };
+        });
+        chart.setOption({ series: [{ data: devData }], yAxis: { data: d.labels } }, { notMerge: false });
+        break;
+
+      case 'chartVMI':
+        chart.setOption({
+          xAxis: { data: d.labels },
+          series: [{ data: d.vmi }, { data: d.nonVmi }]
+        }, { notMerge: false });
+        break;
+
+      case 'chartTCOCategory':
+        chart.setOption({
+          series: [{ data: d.map(item => ({ name:item.name, value:item.value, itemStyle:{color:item.color} })) }]
+        }, { notMerge: false });
+        break;
+
+      case 'chartMarketPriceTrend':
+        chart.setOption({
+          legend: { data: [d.name1, d.name2, d.name3] },
+          series: [
+            { name:d.name1, data:d.line1, lineStyle:{color:d.color1,width:2.5}, areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:d.color1+'40'},{offset:1,color:d.color1+'00'}])} },
+            { name:d.name2, data:d.line2, lineStyle:{color:d.color2,width:2.5}, areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:d.color2+'33'},{offset:1,color:d.color2+'00'}])} },
+            { name:d.name3, data:d.line3, lineStyle:{color:d.color3,width:2.5}, areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:d.color3+'33'},{offset:1,color:d.color3+'00'}])} }
+          ]
+        }, { notMerge: false });
+        break;
+
+      case 'chartConsumptionInventory':
+        chart.setOption({
+          series: [
+            { data: d.consume },
+            { data: d.inventory }
+          ]
+        }, { notMerge: false });
+        break;
+
+      case 'chartInventoryHealth':
+        const healthColors = { safe:COLORS.green, warn:COLORS.gold, danger:COLORS.red };
+        const healthData = d.values.map((v,i) => {
+          const st = d.status[i];
+          return { value:v, itemStyle:{color:healthColors[st]}, label:{show:true,position:'right',formatter:`${v}天 ${st==='danger'?'⚠风险':st==='warn'?'警戒':'安全'}`, color:healthColors[st], fontSize:10} };
+        });
+        chart.setOption({ yAxis: { data: d.labels }, series: [{ data: healthData }] }, { notMerge: false });
+        break;
+
+      case 'chartMaterialCostRate':
+        chart.setOption({
+          legend: { data: [d.n1, d.n2, d.n3, d.n4] },
+          series: [
+            { name:d.n1, data:d.l1, lineStyle:{color:d.c1,width:2.5} },
+            { name:d.n2, data:d.l2, lineStyle:{color:d.c2,width:2} },
+            { name:d.n3, data:d.l3, lineStyle:{color:d.c3,width:2} },
+            { name:d.n4, data:d.l4, lineStyle:{color:d.c4,width:2} }
+          ]
+        }, { notMerge: false });
+        break;
+
+      case 'chartBuCostRate':
+        const costData = d.values.map(v => {
+          let c = v < 67 ? COLORS.green : v < 71 ? COLORS.gold : COLORS.red;
+          return { value:v, itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:c},{offset:1,color:c+'4d'}]), borderRadius:[0,4,4,0]}, label:{show:true,position:'right',formatter:`${v}%`, color:c, fontSize:11, fontWeight:600} };
+        });
+        chart.setOption({ yAxis: { data: d.labels }, series: [{ data: costData }] }, { notMerge: false });
+        break;
+
+      case 'chartSupplierRadar':
+        chart.setOption({
+          series: [{
+            type:'radar',
+            data:[
+              { name:'当前得分', value:d.current, lineStyle:{color:COLORS.cyan,width:2.5}, areaStyle:{color:'rgba(56,189,248,0.18)'}, itemStyle:{color:COLORS.cyan}},
+              { name:'目标基准', value:d.target, lineStyle:{color:COLORS.gold,width:2,dashArray:[5,3]}, areaStyle:{color:'rgba(245,158,11,0.08)'}, itemStyle:{color:COLORS.gold}},
+              { name:'行业Top10%', value:d.top10, lineStyle:{color:COLORS.green,width:2,dashArray:[2,2]}, areaStyle:{color:'rgba(16,185,129,0.05)'}, itemStyle:{color:COLORS.green}}
+            ]
+          }]
+        }, { notMerge: false });
+        break;
+
+      case 'chartSpendPerfMatch':
+        chart.setOption({
+          xAxis: { data: d.labels },
+          series: [
+            { data: d.barData },
+            { data: d.scatterData }
+          ]
+        }, { notMerge: false });
+        break;
+
+      default:
+        // 未注册的图表：仅更新标题提示
+        chart.setOption({ title: { text: `当前维度: ${dimName}`, subtext: '(演示模式)' } }, { notMerge: false });
+    }
+  }
+
+  // ---- 绑定所有维度切换按钮 ----
+  $$('.dim-toggle').forEach(toggle => {
+    const targetIds = (toggle.dataset.dimTarget || '').split(',').map(s=>s.trim()).filter(Boolean);
+    toggle.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // 更新按钮样式
+        toggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // 应用到关联图表
+        const dimVal = btn.dataset.dim;
+        targetIds.forEach(id => applyDimension(id, dimVal));
+      });
+    });
+  });
+
+  /* ================================================================
+     PART 3: 图表实例管理 & 初始化
+     ================================================================ */
+  const chartInstances = {};
+
+  function initChart(id, option) {
+    const el = $(`#${id}`);
+    if (!el) { console.warn(`[图表] #${id} 元素不存在`); return null; }
+    const chart = echarts.init(el, null, { renderer: 'canvas' });
+    chart.setOption(option);
+    chartInstances[id] = chart;
+    // 记录默认维度
+    const firstBtn = $(`.dim-toggle[data-dim-target*="${id}"] button.active`);
+    if (firstBtn) _dimState[id] = firstBtn.dataset.dim;
+    else _dimState[id] = '集团';
+    return chart;
+  }
+
+  function findTabByChartId(chartId) {
+    return Object.keys(TAB_MAP).find((tabId) => TAB_MAP[tabId].charts.includes(chartId)) || null;
+  }
+
+  function focusChartFromAi(chartId) {
+    const targetTab = findTabByChartId(chartId);
+    if (targetTab) {
+      switchTab(targetTab);
+    }
+
+    const chart = chartInstances[chartId];
+    if (!chart) {
+      return false;
+    }
+
+    aiContextBridge.syncChartSelection({ chartId, params: { name: chartId } });
+    requestAnimationFrame(() => {
+      try { chart.resize(); } catch (error) {}
+      try { chart.dispatchAction({ type: 'highlight', seriesIndex: 0, dataIndex: 0 }); } catch (error) {}
+    });
+    return true;
+  }
+
+  function bindFilterEvents() {
+    $$('[data-filter-key]').forEach((element) => {
+      const syncFilter = () => {
+        const currentFilters = dashboardStateBus.getSnapshot().ui.activeFilters;
+        const nextValue = element.value || element.dataset.filterValue || null;
+        aiContextBridge.syncFilters({
+          ...currentFilters,
+          [element.dataset.filterKey]: nextValue
+        });
+      };
+
+      element.addEventListener('change', syncFilter);
+      element.addEventListener('click', syncFilter);
+    });
+  }
+
+  window.PIDashboardAI = {
+    ...(window.PIDashboardAI || {}),
+    stateBus: dashboardStateBus,
+    contextBridge: aiContextBridge,
+    navigateToTab: switchTab,
+    focusChart: focusChartFromAi
+  };
+
+  // ---- 通用配置 ----
+  const COMMON = {
+    textStyle: { fontFamily: "'Inter','PingFang SC',sans-serif", color: '#94a3b8' },
+    axisLine: { lineStyle: { color: 'rgba(148,163,184,0.15)' } },
+    splitLine: { lineStyle: { color: 'rgba(148,163,184,0.08)' } },
+    tooltip: {
+      backgroundColor: 'rgba(17,24,39,0.95)',
+      borderColor: 'rgba(56,189,248,0.25)', borderWidth: 1,
+      textStyle: { color: '#e2e8f0', fontSize: 12 },
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.35);padding:10px 14px;'
+    },
+    legend: { textStyle: { color: '#94a3b8', fontSize: 11 }, itemWidth: 16, itemHeight: 8, itemGap: 16, top: 4, right: 12 }
+  };
+
+
+  /* ================================================================
+     PART 4: 图表初始化 (37个实例)
+     ================================================================ */
+
+  // ---- M1: 降本分析 (11个) ----
+  initChart('chartMonthlySavings', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' },
+    legend: { ...COMMON.legend, data:['实际降本(万)','预算(万)','达成率%'] },
+    grid: { top:55, right:60, bottom:30, left:65 },
+    xAxis: [{ type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:11}, ...COMMON.axisLine }],
+    yAxis: [
+      { type:'value', name:'金额(万)', nameTextStyle:{color:'#94a3b8'}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle}, ...COMMON.axisLine },
+      { type:'value', name:'达成率%', nameTextStyle:{color:'#94a3b8'}, min:50, max:120, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,formatter:'{value}%'}, ...COMMON.axisLine }
+    ],
+    series: [
+      { name:'实际降本(万)', type:'bar', barWidth:'40%', barMaxWidth:24, itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:COLORS.cyan},{offset:1,color:'rgba(56,189,248,0.2)'}]), borderRadius:[3,3,0,0]}, data:DIM_DATA.chartMonthlySavings['集团'].actual },
+      { name:'预算(万)', type:'bar', barWidth:'40%', barMaxWidth:24, itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:COLORS.gold},{offset:1,color:'rgba(245,158,11,0.2)'}]), borderRadius:[3,3,0,0]}, data:DIM_DATA.chartMonthlySavings['集团'].budget },
+      { name:'达成率%', type:'line', yAxisIndex:1, smooth:true, symbol:'circle', symbolSize:6, lineStyle:{color:COLORS.green,width:2}, itemStyle:{color:COLORS.green}, areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(16,185,129,0.25)'},{offset:1,color:'rgba(16,185,129,0)'}])}, data:DIM_DATA.chartMonthlySavings['集团'].rate }
+    ]
+  });
+
+  // M1-2/1-3: 事业部/子公司降本横向柱状图
+  const hBarOpt = (id, dKey) => ({
+    tooltip: { ...COMMON.tooltip, trigger:'axis', axisPointer:{type:'shadow'} },
+    grid: { top:20, right:80, bottom:30, left:100 },
+    xAxis: { type:'value', axisLabel:{...COMMON.textStyle,formatter:'{value}万'}, splitLine:COMMON.splitLine, ...COMMON.axisLine },
+    yAxis: { type:'category', data:DIM_DATA[dKey]['集团'].labels, axisLabel:{...COMMON.textStyle,fontSize:11}, ...COMMON.axisLine },
+    series: [
+      { name:'实际', type:'bar', barMaxWidth:18, itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:id==='chartBuSavings'?COLORS.cyan:COLORS.purple},{offset:1,color:id==='chartBuSavings'?'rgba(56,189,248,0.3)':'rgba(167,139,250,0.3)'}]), borderRadius:[0,4,4,0]}, data:DIM_DATA[dKey]['集团'].actual },
+      { name:'目标', type:'bar', barMaxWidth:18, itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:COLORS.gold},{offset:1,color:'rgba(245,158,11,0.3)'}]), borderRadius:[0,4,4,0]}, data:DIM_DATA[dKey]['集团'].target }
+    ]
+  });
+  initChart('chartBuSavings', hBarOpt('chartBuSavings','chartBuSavings'));
+  initChart('chartSubSavings', hBarOpt('chartSubSavings','chartSubSavings'));
+
+  // M1-4~6: 非生产品类环形图
+  const pieOpt = (titleText, val, budget) => ({
+    tooltip: { ...COMMON.tooltip, formatter:'{b}: {c}万 ({d}%)' },
+    legend: { ...COMMON.legend, orient:'vertical', left:'left', top:'center' },
+    series: [{ type:'pie', radius:['45%','72%'], center:['55%','52%'], label:{show:true,formatter:'{b}\n{d}%', color:'#cbd5e1', fontSize:11}, emphasis:{label:{show:true, fontSize:13, fontWeight:'bold'}}, data:[{name:'已实现', value:val, itemStyle:{color:COLORS.cyan}}, {name:'预算剩余', value:Math.max(0,budget-val), itemStyle:{color:'rgba(148,163,184,0.15)'}}] }]
+  });
+  initChart('chartMroSavings', pieOpt('MRO物料',420,500));
+  initChart('chartItSavings', pieOpt('IT设备与服务',280,350));
+  initChart('chartLogisticsSavings', pieOpt('物流与仓储服务',360,400));
+
+  // M1-7/1-8: 趋势面积线图
+  const areaLineOpt = (id, name1, name2, c1, c2, d1, d2) => ({
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:[name1,name2] },
+    grid: { top:45, right:20, bottom:25, left:55 }, xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, boundaryGap:false, ...COMMON.axisLine },
+    yAxis: { type:'value', splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    series: [ { name:name1, type:'line', smooth:true, symbol:'circle', symbolSize:4, lineStyle:{color:c1,width:2}, areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:c1+'40'},{offset:1,color:c1+'00'}])}, data:d1 }, { name:name2, type:'line', smooth:true, symbol:'circle', symbolSize:4, lineStyle:{color:c2,width:2,dashArray:[5,3]}, data:d2 } ]
+  });
+  initChart('chartProcureAmount', areaLineOpt('chartProcureAmount','实际采购额','预算',COLORS.cyan,COLORS.gold,[3.62,3.38,4.05,3.82,4.32,4.48,4.58,4.68,4.75,4.82,4.88,4.67],[3.85,3.70,4.22,4.08,4.45,4.58,4.68,4.78,4.85,4.92,4.98,5.00]));
+  initChart('chartSavingRatio', areaLineOpt('chartSavingRatio','实际降本比例','计划降本比例',COLORS.green,COLORS.gold,[5.80,5.48,5.78,5.44,5.93,6.07,6.31,6.43,6.63,6.76,6.93,6.86],[6.49,6.49,6.64,6.37,6.74,6.83,6.84,6.83,6.91,6.97,7.03,7.04]));
+
+  // M1-9~11: 预测仪表盘
+  const gaugeOpt = (val, max, color, suffix) => ({ series: [{ type:'gauge', radius:'85%', center:['50%','60%'], startAngle:220, endAngle:-40, axisLine: { lineStyle: { width:14, color:[[1,color]] } }, axisTick:{show:false}, splitLine:{show:false}, axisLabel:{show:false}, pointer:{ icon:'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z', length:'60%', width:6, offsetCenter:[0,'-10%'], itemStyle:{color:'auto'} }, detail:{ valueAnimation:true, formatter:function(p){return p+suffix;}, fontSize:22, fontWeight:700, color:'#e2e8f0', offsetCenter:[0,'20%'] }, data:[{value:val, max:max}] }] });
+  initChart('chartForecastAmount', gaugeOpt(3.26,4.0,COLORS.cyan,'亿'));
+  initChart('chartForecastYoy', gaugeOpt(22.1,30,COLORS.green,'%'));
+  initChart('chartForecastRatio', gaugeOpt(6.52,8.0,COLORS.gold,'%'));
+
+  // ---- M2: 支出分析 (10个) ----
+  initChart('chartCoreSpend', {
+    tooltip: { ...COMMON.tooltip, formatter:'{b}: {c}亿 ({d}%)' },
+    series: [{ type:'treemap', width:'95%', height:'90%', roam:false, nodeClick:false, breadcrumb:{show:false}, label:{show:true, formatter:'{b}\n{c}亿', fontSize:12, color:'#fff'}, itemStyle:{borderColor:'#0a0e1a', borderWidth:3, gapWidth:3}, levels:[{itemStyle:{borderColor:'#0a0e1a', borderWidth:4, gapWidth:3}}], data:DIM_DATA.chartCoreSpend['按品类'] }]
+  });
+
+  initChart('chartPriceDeviation', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis', axisPointer:{type:'shadow'}, formatter:function(p){const d=p[0];return `${d.name}<br/>偏离度:<strong>${d.value}%</strong><br/>阈值:±5%(中危)/±8%(高危)`;} },
+    grid: { top:30, right:20, bottom:35, left:85 },
+    xAxis: { type:'value', axisLabel:{...COMMON.textStyle,formatter:'{value}%'}, splitLine:COMMON.splitLine, ...COMMON.axisLine },
+    yAxis: { type:'category', data:CATEGORIES, axisLabel:{...COMMON.textStyle,fontSize:11}, ...COMMON.axisLine },
+    series: [{ type:'bar', barMaxWidth:22, markLine:{ silent:true, symbol:'none', lineStyle:{color:COLORS.gold,type:'dashed',width:1.5}, data:[{xAxis:5,label:{formatter:'中危阈值±5%',color:COLORS.gold,fontSize:10}},{xAxis:-5},{xAxis:8,label:{formatter:'高危阈值±8%',color:COLORS.red,fontSize:10}},{xAxis:-8}] }, data:DIM_DATA.chartPriceDeviation['按品类'].values.map((v,i)=>{let c=COLORS.green;if(Math.abs(v)>5)c=COLORS.red;else if(Math.abs(v)>3)c=COLORS.gold;return{value:v,itemStyle:{color:c},label:{show:true,position:v>=0?'right':'left',formatter:`${v}%`,color:c,fontSize:11,fontWeight:600}};}) }]
+  });
+
+  initChart('chartPriceTrendCompare', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['我司采购均价','市场公允价','偏离度%'] },
+    grid: { top:50, right:60, bottom:25, left:55 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'元/吨', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },{ type:'value', name:'偏离%', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,fontSize:10,formatter:'{value}%'}, ...COMMON.axisLine }],
+    series: [ {name:'我司采购均价',type:'line',smooth:true,symbol:'circle',symbolSize:5,lineStyle:{color:COLORS.cyan,width:2},data:[3850,3800,3920,3880,4010,3960,3900,3880,3850,3880,3900,3880]},{name:'市场公允价',type:'line',smooth:true,symbol:'circle',symbolSize:5,lineStyle:{color:COLORS.green,width:2,dashArray:[5,3]},data:[3660,3620,3740,3680,3780,3720,3680,3667,3640,3667,3680,3667]},{name:'偏离度%',type:'line',yAxisIndex:1,smooth:true,symbol:'diamond',symbolSize:5,lineStyle:{color:COLORS.red,width:2},data:[5.2,5.0,4.8,5.4,6.1,6.5,6.0,5.8,5.7,5.8,6.0,5.8]} ]
+  });
+
+  initChart('chartInventorySpend', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['月度支出(亿)','库存金额(亿)'] },
+    grid: { top:50, right:60, bottom:25, left:55 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'月度支出(亿)', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },{ type:'value', name:'库存(亿)', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine }],
+    series: [ {name:'月度支出(亿)',type:'bar',barMaxWidth:20,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:COLORS.cyan},{offset:1,color:'rgba(56,189,248,0.2)'}]),borderRadius:[3,3,0,0]},data:[3.62,3.38,4.05,3.82,4.32,4.48,4.58,4.68,4.75,4.82,4.88,4.67]},{name:'库存金额(亿)',type:'line',yAxisIndex:1,smooth:true,symbol:'circle',symbolSize:5,lineStyle:{color:COLORS.purple,width:2},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(167,139,250,0.15)'},{offset:1,color:'rgba(167,139,250,0)'}])},data:[8.2,8.0,8.5,8.3,8.8,9.0,9.2,9.4,9.5,9.6,9.5,9.3]} ]
+  });
+
+  initChart('chartVMI', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['VMI覆盖','非VMI'] },
+    grid: { top:45, right:20, bottom:30, left:50 },
+    xAxis: { type:'category', data:CATEGORIES.slice(0,5), axisLabel:{...COMMON.textStyle,fontSize:10,rotate:15}, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'占比%', nameTextStyle:{color:'#94a3b8',fontSize:10}, max:100, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10,formatter:'{value}%'}, ...COMMON.axisLine },
+    series: [ {name:'VMI覆盖',type:'bar',stack:'total',barMaxWidth:24,itemStyle:{color:COLORS.cyan},data:DIM_DATA.chartVMI['按品类'].vmi},{name:'非VMI',type:'bar',stack:'total',barMaxWidth:24,itemStyle:{color:'rgba(148,163,184,0.2)'},data:DIM_DATA.chartVMI['按品类'].nonVmi} ]
+  });
+
+  initChart('chartSupplierConc', {
+    tooltip: { ...COMMON.tooltip },
+    radar: { indicator:[{name:'CR5集中度',max:100},{name:'供应商数量',max:200},{name:'平均采购额',max:1000},{name:'新供引入率',max:20},{name:'战略供占比',max:30},{name:'风险分散度',max:100}], shape:'polygon', splitNumber:4, axisName:{color:'#94a3b8',fontSize:10}, splitArea:{areaStyle:{color:['rgba(56,189,248,0.02)','rgba(56,189,248,0.04)','rgba(56,189,248,0.06)','rgba(56,189,248,0.08)']}}, axisLine:{lineStyle:{color:'rgba(148,163,184,0.15)'}}, splitLine:{lineStyle:{color:'rgba(148,163,184,0.1)'}} },
+    series: [{ type:'radar', data:[{value:[67.3,128,380,3.7,8.6,72],name:'当前状态',lineStyle:{color:COLORS.cyan,width:2},areaStyle:{color:'rgba(56,189,248,0.15)'},itemStyle:{color:COLORS.cyan}},{value:[60,150,320,5.0,12,80],name:'目标基准',lineStyle:{color:COLORS.gold,width:2,dashArray:[5,3]},areaStyle:{color:'rgba(245,158,11,0.08)'},itemStyle:{color:COLORS.gold}}] }]
+  });
+
+  const tcoPie = (d) => ({ tooltip:{...COMMON.tooltip,formatter:'{b}:{c}亿({d}%)'}, legend:{...COMMON.legend,orient:'vertical',left:'left',top:'center',textStyle:{fontSize:10}}, series:[{type:'pie',radius:['38%','68%'],center:['55%','52%'],roseType:'radius',label:{show:true,formatter:'{b}\n{d}%',fontSize:10,color:'#cbd5e1'},data:d.map(i=>({name:i.name,value:i.value,itemStyle:{color:i.color}}))}] });
+  initChart('chartTCOCategory', tcoPie(DIM_DATA.chartTCOCategory['按品类']));
+  initChart('chartTCOBu', tcoPie(DIM_DATA.chartTCOCategory['按事业部']));
+  initChart('chartTCOSubsidiary', tcoPie(DIM_DATA.chartTCOCategory['按子公司']));
+
+  initChart('chartLongContract', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis', axisPointer:{type:'shadow'} }, legend: { ...COMMON.legend, data:['长约覆盖率','目标线'] },
+    grid: { top:45, right:20, bottom:30, left:50 },
+    xAxis: { type:'category', data:CATEGORIES, axisLabel:{...COMMON.textStyle,fontSize:10,rotate:15}, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'%', nameTextStyle:{color:'#94a3b8',fontSize:10}, max:100, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10,formatter:'{value}%'}, ...COMMON.axisLine },
+    series: [ {name:'长约覆盖率',type:'bar',barMaxWidth:28,itemStyle:(p)=>({color:p.value>=65?COLORS.green:p.value>=45?COLORS.gold:COLORS.red}),data:[78.5,52.3,35.8,45.2,62.0,92.0,38.0],label:{show:true,position:'top',formatter:'{c}%',fontSize:10,color:'#cbd5e1'}},{name:'目标线',type:'line',symbol:'none',lineStyle:{color:COLORS.gold,width:2,dashArray:[6,4]},data:[70,60,50,55,65,80,50]} ]
+  });
+
+
+  // ---- M3: 价格趋势 (7个) ----
+  initChart('chartMarketPriceTrend', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['热轧卷板(元/吨)','PP拉丝(元/吨)','MDI(元/吨)'] },
+    grid: { top:55, right:60, bottom:30, left:60 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, boundaryGap:false, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'元/吨', nameTextStyle:{color:'#94a3b8'}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle}, ...COMMON.axisLine },
+    series: [ {name:'热轧卷板(元/吨)',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.cyan,width:2.5},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(56,189,248,0.25)'},{offset:1,color:'rgba(56,189,248,0)'}])},data:DIM_DATA.chartMarketPriceTrend['热轧卷板'].line1},{name:'PP拉丝(元/吨)',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.gold,width:2.5},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(245,158,11,0.2)'},{offset:1,color:'rgba(245,158,11,0)'}])},data:DIM_DATA.chartMarketPriceTrend['热轧卷板'].line2},{name:'MDI(元/吨)',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.green,width:2.5},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(16,185,129,0.2)'},{offset:1,color:'rgba(16,185,129,0)'}])},data:DIM_DATA.chartMarketPriceTrend['热轧卷板'].line3} ]
+  });
+
+  initChart('chartFuturesPrice', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['螺纹钢主力','原油主力','PP主力'] },
+    grid: { top:45, right:60, bottom:25, left:55 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, boundaryGap:false, ...COMMON.axisLine },
+    yAxis: { type:'value', splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    series: [ {name:'螺纹钢主力',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.cyan,width:2},data:[3650,3520,3750,3620,3820,3890,3800,3710,3640,3710,3760,3710]},{name:'原油主力',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.gold,width:2},data:[72.5,68.2,74.8,71.2,76.5,79.2,77.8,75.4,73.2,75.4,77.0,75.4]},{name:'PP主力',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.green,width:2},data:[7380,7220,7520,7440,7680,7820,7740,7580,7480,7580,7660,7580]} ]
+  });
+
+  initChart('chartMacroIndicators', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['PPI同比%','PMI指数','CPI同比%','USD/CNY汇率'] },
+    grid: { top:50, right:65, bottom:28, left:52 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', position:'left', splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },{ type:'value', position:'right', min:7.0, max:7.5, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine }],
+    series: [ {name:'PPI同比%',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.red,width:2},data:[-2.5,-2.8,-2.2,-2.6,-1.8,-1.5,-1.2,-1.0,-0.8,-1.0,-1.2,-1.0]},{name:'PMI指数',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.green,width:2},data:[49.2,49.0,50.2,49.5,50.8,51.2,50.5,49.8,49.2,49.8,50.2,49.8]},{name:'CPI同比%',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.gold,width:2},data:[0.2,0.5,0.3,0.4,0.6,0.5,0.3,0.2,0.1,0.2,0.3,0.2]},{name:'USD/CNY汇率',type:'line',yAxisIndex:1,smooth:true,symbolSize:4,lineStyle:{color:COLORS.purple,width:2,dashArray:[4,3]},data:[7.182,7.195,7.210,7.228,7.245,7.260,7.250,7.240,7.230,7.248,7.255,7.248]} ]
+  });
+
+  initChart('chartProcureVsMarket', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['我司采购价','市场公允价','价差(右轴)'] },
+    grid: { top:50, right:60, bottom:28, left:55 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'元/吨', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },{ type:'value', name:'价差%', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,fontSize:10,formatter:'{value}%'}, ...COMMON.axisLine }],
+    series: [ {name:'我司采购价',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.cyan,width:2.5},data:[3850,3800,3920,3880,4010,3960,3900,3880,3850,3880,3900,3880]},{name:'市场公允价',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.green,width:2,dashArray:[5,3]},data:[3660,3620,3740,3680,3780,3720,3680,3667,3640,3667,3680,3667]},{name:'价差(右轴)',type:'bar',yAxisIndex:1,barMaxWidth:14,itemStyle:(p)=>({color:p.value>0?COLORS.red:COLORS.green}),data:[5.2,5.0,4.8,5.4,6.1,6.5,6.0,5.8,5.7,5.8,6.0,5.8],label:{show:true,position:'top',formatter:'{c}%',fontSize:9,color:'#94a3b8'}} ]
+  });
+
+  initChart('chartInventoryLevel', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:BUs },
+    grid: { top:45, right:18, bottom:30, left:45 },
+    xAxis: { type:'category', data:CATEGORIES.slice(0,5), axisLabel:{...COMMON.textStyle,fontSize:10,rotate:15}, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'万吨', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    series: BUs.map((bu,i)=>({name:bu,type:'bar',stack:'total',barMaxWidth:20,itemStyle:{color:COLOR_ARRAY[i]},data:i===0?[4200,2800,1800,1200,800]:i===1?[3200,2200,1400,900,600]:i===2?[2100,1500,1060,500,350]:[1100,700,400,200,150]}))
+  });
+
+  initChart('chartPriceForecast', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['实际值','预测值','预测上限','预测下限'] },
+    grid: { top:50, right:18, bottom:30, left:50 },
+    xAxis: { type:'category', data:['8月','9月','10月','11月','12月','1月(预)','2月(预)','3月(预)'], axisLabel:{...COMMON.textStyle,fontSize:10}, boundaryGap:false, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'元/吨', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    series: [ {name:'实际值',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.cyan,width:2.5},data:[3750,3667,3600,3667,3700,null,null,null]},{name:'预测值',type:'line',smooth:true,symbolSize:5,symbol:'diamond',lineStyle:{color:COLORS.gold,width:2.5,dashArray:[6,3]},data:[null,null,null,null,3700,3740,3780,3720]},{name:'预测上限',type:'line',smooth:true,symbol:'none',lineStyle:{color:COLORS.gold,width:1,opacity:0.4},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(245,158,11,0.08)'},{offset:1,color:'rgba(245,158,11,0)'}])},data:[null,null,null,null,3780,3840,3900,3820]},{name:'预测下限',type:'line',smooth:true,symbol:'none',lineStyle:{color:COLORS.gold,width:1,opacity:0.4},data:[null,null,null,null,3620,3640,3660,3620]} ],
+    markArea: { silent:true, itemStyle:{color:'rgba(245,158,11,0.04)'}, data:[[{coordName:'1月(预)'},{coordName:'3月(预)'}]] }
+  });
+
+  initChart('chartPurchaseScenario', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['当前节奏成本','提前锁价成本','延迟采购成本','最优节奏建议'] },
+    grid: { top:50, right:18, bottom:30, left:50 },
+    xAxis: { type:'category', data:['Q1','Q2','Q3','Q4'], axisLabel:{...COMMON.textStyle,fontSize:11}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'万元', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine }],
+    series: [ {name:'当前节奏成本',type:'bar',barMaxWidth:22,itemStyle:{color:COLORS.cyan},data:[12500,11800,12100,12200],label:{show:true,position:'top',formatter:'{c}',fontSize:10}},{name:'提前锁价成本',type:'bar',barMaxWidth:22,itemStyle:{color:COLORS.green},data:[11900,11400,11600,11500],label:{show:true,position:'top',formatter:'{c}',fontSize:10}},{name:'延迟采购成本',type:'bar',barMaxWidth:22,itemStyle:{color:COLORS.red},data:[13200,12600,12800,13000],label:{show:true,position:'top',formatter:'{c}',fontSize:10}},{name:'最优节奏建议',type:'line',smooth:true,symbolSize:8,symbol:'diamond',lineStyle:{color:COLORS.gold,width:3},data:[11700,11200,11400,11300],markPoint:{symbol:'pin',symbolSize:40,data:[{coord:[0,11700],value:'锁约\n70%',label:{color:COLORS.gold,fontSize:9}},{coord:[1,11200],value:'锁约\n80%',label:{color:COLORS.gold,fontSize:9}},{coord:[2,11400],value:'锁约\n60%',label:{color:COLORS.gold,fontSize:9}},{coord:[3,11300],value:'锁约\n85%',label:{color:COLORS.gold,fontSize:9}}]}} ]
+  });
+
+  // ---- M4: 需求趋势 (3个) ----
+  initChart('chartConsumptionInventory', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['日均消耗量(吨)','库存保有量(万吨)'] },
+    grid: { top:50, right:60, bottom:28, left:55 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'吨/天', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },{ type:'value', name:'万吨', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine }],
+    series: [ {name:'日均消耗量(吨)',type:'bar',barMaxWidth:18,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:COLORS.cyan},{offset:1,color:'rgba(56,189,248,0.2)'}]),borderRadius:[3,3,0,0]},data:DIM_DATA.chartConsumptionInventory['集团'].consume},{name:'库存保有量(万吨)',type:'line',yAxisIndex:1,smooth:true,symbol:'circle',symbolSize:5,lineStyle:{color:COLORS.purple,width:2},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(167,139,250,0.15)'},{offset:1,color:'rgba(167,139,250,0)'}])},data:DIM_DATA.chartConsumptionInventory['集团'].inventory} ]
+  });
+
+  const healthColors = { safe:COLORS.green, warn:COLORS.gold, danger:COLORS.red };
+  initChart('chartInventoryHealth', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis', axisPointer:{type:'shadow'}, formatter:function(p){const d=p[0];return `${d.name}<br/>可支撑天数:<strong>${d.value}天</strong><br/>安全线:15天 | 警戒线:10天`;} },
+    grid: { top:20, right:80, bottom:20, left:95 },
+    xAxis: { type:'value', name:'可支撑天数', nameTextStyle:{color:'#94a3b8',fontSize:10}, max:35, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: { type:'category', data:CATEGORIES, axisLabel:{...COMMON.textStyle,fontSize:11}, inverse:true, ...COMMON.axisLine },
+    series: [{ type:'bar', barMaxWidth:20,
+      markLine: { silent:true, symbol:'none', lineStyle:[{type:'solid',color:COLORS.red,width:1.5},{type:'dashed',color:COLORS.gold,width:1}], data:[{xAxis:10,label:{formatter:'警戒线10天',color:COLORS.red,fontSize:9},lineStyle:{color:COLORS.red,type:'solid'}},{xAxis:15,label:{formatter:'安全线15天',color:COLORS.gold,fontSize:9},lineStyle:{color:COLORS.gold,type:'dashed'}}] },
+      data: DIM_DATA.chartInventoryHealth['按品类'].values.map((v,i)=>{const st=DIM_DATA.chartInventoryHealth['按品类'].status[i];return{value:v,itemStyle:{color:healthColors[st]},label:{show:true,position:'right',formatter:`${v}天 ${st==='danger'?'⚠风险':st==='warn'?'警戒':'安全'}`,color:healthColors[st],fontSize:10}};}) }]
+  });
+
+  initChart('chartDemandForecast', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['历史实际','预测均值','预测上限','预测下限'] },
+    grid: { top:50, right:60, bottom:28, left:45 },
+    xAxis: { type:'category', data:['W49','W50','W51','W52','W01(预)','W02(预)','W03(预)','W04(预)'], axisLabel:{...COMMON.textStyle,fontSize:10}, boundaryGap:false, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'吨/天', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    series: [ {name:'历史实际',type:'line',smooth:true,symbolSize:5,lineStyle:{color:COLORS.cyan,width:2.5},data:[1290,1310,1330,1320,null,null,null,null]},{name:'预测均值',type:'line',smooth:true,symbolSize:5,symbol:'diamond',lineStyle:{color:COLORS.gold,width:2.5,dashArray:[6,3]},data:[null,null,null,null,1350,1380,1420,1390]},{name:'预测上限',type:'line',smooth:true,symbol:'none',lineStyle:{color:COLORS.gold,width:1,opacity:0.4},areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(245,158,11,0.08)'},{offset:1,color:'rgba(245,158,11,0)'}])},data:[null,null,null,null,1410,1450,1500,1460]},{name:'预测下限',type:'line',smooth:true,symbol:'none',lineStyle:{color:COLORS.gold,width:1,opacity:0.4},data:[null,null,null,null,1290,1310,1340,1320]} ],
+    markArea: { silent:true, data:[[{coordName:'W01(预)'},{coordName:'W04(预)'}]], itemStyle:{color:'rgba(245,158,11,0.04)'} }
+  });
+
+  // ---- M5: 材料成本率 (2个) ----
+  initChart('chartMaterialCostRate', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['集团整体','事业部1','事业部2','事业部3'] },
+    grid: { top:50, right:60, bottom:28, left:52 },
+    xAxis: { type:'category', data:MONTHS, axisLabel:{...COMMON.textStyle,fontSize:10}, boundaryGap:false, ...COMMON.axisLine },
+    yAxis: { type:'value', name:'%', nameTextStyle:{color:'#94a3b8',fontSize:10}, min:62, max:76, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    series: [
+      {name:'集团整体',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.cyan,width:2.5},data:DIM_DATA.chartMaterialCostRate['集团'].l1},
+      {name:'事业部1',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.green,width:2},data:DIM_DATA.chartMaterialCostRate['集团'].l2},
+      {name:'事业部2',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.gold,width:2},data:DIM_DATA.chartMaterialCostRate['集团'].l3},
+      {name:'事业部3',type:'line',smooth:true,symbolSize:4,lineStyle:{color:COLORS.red,width:2},data:DIM_DATA.chartMaterialCostRate['集团'].l4}
+    ],
+    markLine: { silent:true, symbol:'none', data:[{yAxis:70,label:{formatter:'目标线70%',color:COLORS.gold,fontSize:10},lineStyle:{color:COLORS.gold,type:'dashed',width:1.5}}] }
+  });
+
+  initChart('chartBuCostRate', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis', axisPointer:{type:'shadow'} },
+    grid: { top:15, right:80, bottom:15, left:100 },
+    xAxis: { type:'value', name:'%', nameTextStyle:{color:'#94a3b8',fontSize:10}, min:63, max:75, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: { type:'category', data:BUs, axisLabel:{...COMMON.textStyle,fontSize:11}, ...COMMON.axisLine },
+    series: [{
+      type:'bar', barMaxWidth:22,
+      markLine: { silent:true, symbol:'none', data:[{xAxis:70,label:{formatter:'目标70%',color:COLORS.gold,fontSize:10},lineStyle:{color:COLORS.gold,type:'dashed',width:2}}] },
+      data: DIM_DATA.chartBuCostRate['2025年'].values.map(v=>{let c=v<67?COLORS.green:v<71?COLORS.gold:COLORS.red;return{value:v,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:c},{offset:1,color:c+'4d'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:`${v}%`,color:c,fontSize:11,fontWeight:600}};})
+    }]
+  });
+
+  // ---- M6: 其他降本机会 (2个) ----
+  initChart('chartSmallSuppliersCat', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis' }, legend: { ...COMMON.legend, data:['分散金额(万)','整合节约预估(万)'] },
+    grid: { top:45, right:60, bottom:30, left:70 },
+    xAxis: { type:'category', data:['MRO物料','包装材料','通用备件','IT设备','劳保用品','办公耗材','物流服务'], axisLabel:{...COMMON.textStyle,fontSize:10,rotate:15}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'万元', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },{ type:'value', name:'节约(万)', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:{show:false}, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine }],
+    series: [ {name:'分散金额(万)',type:'bar',barMaxWidth:22,itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:COLORS.gold},{offset:1,color:'rgba(245,158,11,0.2)'}]),borderRadius:[3,3,0,0]},data:[1240,860,720,480,340,260,210]},{name:'整合节约预估(万)',type:'line',yAxisIndex:1,smooth:true,symbolSize:6,lineStyle:{color:COLORS.green,width:2.5},data:[320,180,150,95,68,52,42],label:{show:true,position:'top',formatter:'{c}',fontSize:9,color:COLORS.green}} ]
+  });
+
+  initChart('chartSmallSuppliersBu', {
+    tooltip: { ...COMMON.tooltip },
+    radar: { indicator:[{name:'分散供应商数',max:50},{name:'分散金额(万)',max:1500},{name:'平均单家采购额',max:15},{name:'品类覆盖数',max:20},{name:'整合难度',max:100},{name:'预计节约率',max:35}], shape:'polygon', splitNumber:4, axisName:{color:'#94a3b8',fontSize:10}, splitArea:{areaStyle:{color:['rgba(245,158,11,0.02)','rgba(245,158,11,0.04)','rgba(245,158,11,0.06)','rgba(245,158,11,0.08)']}}, axisLine:{lineStyle:{color:'rgba(148,163,184,0.15)'}}, splitLine:{lineStyle:{color:'rgba(148,163,184,0.1)'}} },
+    series: [{ type:'radar', data:[{value:[42,1240,29.5,12,65,25.8],name:'事业部1',lineStyle:{color:COLORS.cyan,width:2},areaStyle:{color:'rgba(56,189,248,0.15)'},itemStyle:{color:COLORS.cyan}},{value:[28,860,30.7,8,55,20.9],name:'事业部2',lineStyle:{color:COLORS.gold,width:2},areaStyle:{color:'rgba(245,158,11,0.12)'},itemStyle:{color:COLORS.gold}},{value:[18,480,26.7,6,40,19.8],name:'事业部3',lineStyle:{color:COLORS.green,width:2},areaStyle:{color:'rgba(16,185,129,0.12)'},itemStyle:{color:COLORS.green}}] }]
+  });
+
+  // ---- M7: 供应源分析 (2个) ----
+  initChart('chartSupplierRadar', {
+    tooltip: { ...COMMON.tooltip },
+    radar: { indicator:[{name:'交付及时率%',max:100},{name:'质量合格率%',max:100},{name:'价格竞争力%',max:100},{name:'服务响应度',max:100},{name:'创新能力',max:100},{name:'合规评分',max:100}], shape:'polygon', splitNumber:5, axisName:{color:'#94a3b8',fontSize:10}, splitArea:{areaStyle:{color:['rgba(56,189,248,0.02)','rgba(56,189,248,0.04)','rgba(56,189,248,0.06)','rgba(56,189,248,0.08)','rgba(56,189,248,0.1)']}}, axisLine:{lineStyle:{color:'rgba(148,163,184,0.15)'}}, splitLine:{lineStyle:{color:'rgba(148,163,184,0.1)'}} },
+    series: [{ type:'radar', data:[
+      {value:DIM_DATA.chartSupplierRadar['集团'].current,name:'当前得分',lineStyle:{color:COLORS.cyan,width:2.5},areaStyle:{color:'rgba(56,189,248,0.18)'},itemStyle:{color:COLORS.cyan}},
+      {value:DIM_DATA.chartSupplierRadar['集团'].target,name:'目标基准',lineStyle:{color:COLORS.gold,width:2,dashArray:[5,3]},areaStyle:{color:'rgba(245,158,11,0.08)'},itemStyle:{color:COLORS.gold}},
+      {value:DIM_DATA.chartSupplierRadar['集团'].top10,name:'行业Top10%',lineStyle:{color:COLORS.green,width:2,dashArray:[2,2]},areaStyle:{color:'rgba(16,185,129,0.05)'},itemStyle:{color:COLORS.green}}
+    ]}]
+  });
+
+  initChart('chartSpendPerfMatch', {
+    tooltip: { ...COMMON.tooltip, trigger:'axis', axisPointer:{type:'cross'}, formatter:function(p){if(p[0]&&p[0].componentSubType==='scatter')return`${p[0].name}<br/>支出:${p[0].value[0]}亿<br/>绩效:${p[0].value[1]}分`;const d=p[0];return`${d.name}<br/>支出:${d.value}亿`;} },
+    legend: { ...COMMON.legend, data:['年采购额(亿)','供应商绩效得分'] },
+    grid: { top:50, right:60, bottom:35, left:55 },
+    xAxis: { type:'value', name:'年采购额(亿)', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine },
+    yAxis: [{ type:'value', name:'亿元', nameTextStyle:{color:'#94a3b8',fontSize:10}, splitLine:COMMON.splitLine, axisLabel:{...COMMON.textStyle,fontSize:10}, ...COMMON.axisLine }],
+    series: [
+      {name:'年采购额(亿)',type:'bar',barMaxWidth:26,itemStyle:(p)=>{const v=p.value;let c=COLORS.cyan;if(v>7)c=COLORS.red;else if(v>5)c=COLORS.gold;return{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:c},{offset:1,color:c+'40'}]),borderRadius:[4,4,0,0]};},data:DIM_DATA.chartSpendPerfMatch['按品类'].barData,label:{show:true,position:'top',formatter:'{c}亿',fontSize:9,color:'#cbd5e1'}},
+      {name:'供应商绩效得分',type:'scatter',symbolSize:(p)=>Math.max(p[1]*0.8,12),data:DIM_DATA.chartSpendPerfMatch['按品类'].scatterData,itemStyle:{color:COLORS.purple,opacity:0.85}}
+    ]
+  });
+
+
+  /* ================================================================
+     PART 6: 下钻弹窗组件 (预埋)
+     
+     用法:
+       openDrillDown({ title: 'xxx明细', type: 'kpi|chart|table', sourceId: 'xxx' })
+     弹窗内容区域留空，后续按需填充具体数据
+     ================================================================ */
+  let _modalEl = null;
+
+  function createModal() {
+    _modalEl = document.createElement('div');
+    _modalEl.id = 'drilldown-modal';
+    _modalEl.innerHTML = `
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-title">下钻明细</h3>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-export" id="modal-export" title="导出数据">📥 导出</button>
+            <button class="modal-btn modal-btn-close" id="modal-close" title="关闭">&times;</button>
+          </div>
+        </div>
+        <div class="modal-toolbar" id="modal-toolbar">
+          <div class="modal-tabs"><button class="modal-tab active" data-tab="detail">明细数据</button><button class="modal-tab" data-tab="trend">趋势分析</button><button class="modal-tab" data-tab="compare">对比视图</button></div>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <div class="modal-placeholder">
+            <div class="placeholder-icon">&#128202;</div>
+            <p>下钻数据加载中...</p>
+            <p class="placeholder-sub">此处将展示点击项的详细明细数据</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <span class="modal-hint">💡 提示：点击图表中的数据点或KPI卡片可触发下钻</span>
+        </div>
+      </div>`;
+
+    const mStyle = document.createElement('style');
+    mStyle.textContent = `
+      #drilldown-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000}
+      #drilldown-modal.active{display:block}
+      .modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .2s}
+      @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+      .modal-container{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(900px,92vw);height:min(600px,85vh);background:rgba(17,24,39,.98);border:1px solid rgba(56,189,248,.2);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 80px rgba(56,189,248,.08);animation:modalIn .3s cubic-bezier(.16,1,.3,1)}
+      @keyframes modalIn{from{opacity:0;transform:translate(-50%,-48%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+      .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(56,189,248,.12);flex-shrink:0}
+      .modal-title{margin:0;font-size:16px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px}
+      .modal-actions{display:flex;gap:8px}
+      .modal-btn{padding:6px 12px;border:1px solid rgba(148,163,184,.2);border-radius:8px;background:transparent;color:#94a3b8;cursor:pointer;font-size:12px;transition:all .2s;font-family:inherit}
+      .modal-btn:hover{border-color:#38bdf8;color:#38bdf8;background:rgba(56,189,248,.06)}
+      .modal-btn-close{font-size:18px;padding:4px 8px;line-height:1}
+      .modal-toolbar{padding:10px 20px;border-bottom:1px solid rgba(56,189,248,.08);flex-shrink:0}
+      .modal-tabs{display:flex;gap:4px}
+      .modal-tab{padding:6px 16px;border:1px solid transparent;border-radius:8px;background:transparent;color:#64748b;cursor:pointer;font-size:12px;transition:all .2s;font-family:inherit}
+      .modal-tab:hover{color:#94a3b8;background:rgba(56,189,248,.04)}
+      .modal-tab.active{color:#38bdf8;background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.2)}
+      .modal-body{flex:1;overflow:auto;padding:20px;scrollbar-width:thin}
+      .modal-body::-webkit-scrollbar{width:6px}
+      .modal-body::-webkit-scrollbar-thumb{background:rgba(56,189,248,.15);border-radius:4px}
+      .modal-placeholder{text-align:center;padding:60px 20px;color:#64748b}
+      .placeholder-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+      .placeholder-sub{font-size:12px;color:#475569;margin-top:8px}
+      .modal-footer{padding:10px 20px;border-top:1px solid rgba(56,189,248,.08);flex-shrink:0}
+      .modal-hint{font-size:11px;color:#475569}
+    `;
+    document.head.appendChild(mStyle);
+    document.body.appendChild(_modalEl);
+
+    // 绑定事件
+    $('.modal-overlay').addEventListener('click', closeModal);
+    $('#modal-close').addEventListener('click', closeModal);
+    $$('.modal-tab').forEach(tab => tab.addEventListener('click', () => {
+      $$('.modal-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+    }));
+    $('#modal-export').addEventListener('click', () => {
+      alert('📥 数据导出功能 — 后续对接实际导出API');
+    });
+  }
+
+  function openDrillDown(opts) {
+    if (!_modalEl) createModal();
+    $('#modal-title').innerHTML = `${opts.icon||'📊'} ${opts.title||'下钻明细'}`;
+    $('#modal-body').innerHTML = opts.content || `<div class="modal-placeholder"><div class="placeholder-icon">${opts.icon||'📊'}</div><p>${opts.title} 的详细数据</p><p class="placeholder-sub">来源: ${opts.sourceId||'-'} | 类型: ${opts.type||'-'}</p></div>`;
+    _modalEl.classList.add('active');
+  }
+
+  function closeModal() {
+    if (_modalEl) _modalEl.classList.remove('active');
+  }
+
+  // ESC 关闭弹窗
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* ================================================================
+     PART 7: KPI/图表 点击绑定 → 触发下钻弹窗
+     ================================================================ */
+  function bindDrillDownEvents() {
+    // 所有KPI卡片点击
+    $$('.kpi-card').forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => {
+        const label = card.querySelector('.kpi-label')?.textContent || '指标';
+        const value = card.querySelector('.kpi-value')?.textContent || '';
+        aiContextBridge.syncKpiSelection({ label, value });
+        openDrillDown({
+          title: `${label} - 明细下钻`,
+          icon: '💰',
+          type: 'kpi',
+          sourceId: label,
+          content: `
+            <div style="text-align:center;padding:20px;">
+              <h4 style="color:#38bdf8;font-size:32px;margin:0 0 12px">${value}</h4>
+              <p style="color:#94a3b8;margin:0 0 24px">${label}</p>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:left;">
+                <div style="background:rgba(56,189,248,.06);padding:14px;border-radius:10px;border:1px solid rgba(56,189,248,.1)">
+                  <div style="font-size:11px;color:#64748b">月度趋势</div>
+                  <div style="font-size:18px;color:#38bdf8;font-weight:600;margin-top:4px">↑ 稳步上升</div>
+                </div>
+                <div style="background:rgba(245,158,11,.06);padding:14px;border-radius:10px;border:1px solid rgba(245,158,11,.1)">
+                  <div style="font-size:11px;color:#64748b">同比变化</div>
+                  <div style="font-size:18px;color:#f59e0b;font-weight:600;margin-top:4px">+8.3%</div>
+                </div>
+                <div style="background:rgba(16,185,129,.06);padding:14px;border-radius:10px;border:1px solid rgba(16,185,129,.1)">
+                  <div style="font-size:11px;color:#64748b">目标完成</div>
+                  <div style="font-size:18px;color:#10b981;font-weight:600;margin-top:4px">93.6%</div>
+                </div>
+              </div>
+              <p style="font-size:11px;color:#475569;margin-top:20px;">📌 完整数据表格和图表将在下一步迭代中填充</p>
+            </div>`
+        });
+      });
+    });
+
+    // 图表容器点击 (通过echarts click事件)
+    Object.keys(chartInstances).forEach(id => {
+      try {
+        chartInstances[id].on('click', params => {
+          const name = params.name || params.seriesName || id;
+          aiContextBridge.syncChartSelection({ chartId: id, params });
+          openDrillDown({
+            title: `${name} - 数据下钻`,
+            icon: '📈',
+            type: 'chart',
+            sourceId: id,
+            content: `
+              <div style="text-align:center;padding:30px 20px;">
+                <h4 style="color:#e2e8f0;margin:0 0 8px;font-size:18px">${name}</h4>
+                <p style="color:#94a3b8;margin:0 0 20px;font-size:13px">数值: <strong style="color:#38bdf8">${params.value ?? params.data?.value ?? '-'}</strong></p>
+                <div style="background:rgba(17,24,39,.6);border:1px solid rgba(56,189,248,.1);border-radius:12px;padding:20px;text-align:left;">
+                  <div style="font-size:12px;color:#64748b;margin-bottom:8px">📋 数据详情</div>
+                  <table style="width:100%;font-size:12px;color:#cbd5e1">
+                    <tr><td style="padding:6px 0;color:#64748b">图表ID</td><td style="text-align:right;font-family:monospace;color:#38bdf8">${id}</td></tr>
+                    <tr><td style="padding:6px 0;color:#64748b">系列名</td><td style="text-align:right">${params.seriesName || '-'}</td></tr>
+                    <tr><td style="padding:6px 0;color:#64748b">数据值</td><td style="text-align:right;font-family:monospace;color:#f59e0b;font-weight:600">${params.value ?? params.data?.value ?? '-'}</td></tr>
+                    <tr><td style="padding:6px 0;color:#64748b">维度</td><td style="text-align:right">${_dimState[id] || '集团'}</td></tr>
+                  </table>
+                </div>
+                <p style="font-size:11px;color:#475569;margin-top:16px;">📌 更多下钻维度和数据将在下一步填充</p>
+              </div>`
+          });
+        });
+      } catch(e) {}
+    });
+
+    console.log('[PI Dashboard] 下钻事件绑定完成 — KPI卡片 + 图表点击');
+  }
+
+  /* ================================================================
+     PART 8: 初始化 & 生命周期
+     ================================================================ */
+  function handleResize() {
+    Object.values(chartInstances).forEach(c => { try { c && c.resize(); } catch(e){} });
+  }
+  window.addEventListener('resize', handleResize);
+
+  // DOM Ready后初始化
+  function init() {
+    aiContextBridge.syncTab(_activeTab);
+    bindFilterEvents();
+    const privacyGate = createAiPrivacyGate();
+    const sendProxyMessage = createProxyMessageSender({
+      endpoint: window.__AI_PROXY_ENDPOINT__ || 'http://localhost:3000/api/ai-proxy/chat'
+    });
+    assistantShell = bootAssistantShell({
+      stateBus: dashboardStateBus,
+      privacyGate,
+      onSendMessage: sendProxyMessage
+    });
+    createModal();
+    bindDrillDownEvents();
+
+    console.log('[PI Dashboard] ✅ 初始化完成');
+    console.log(`[PI Dashboard] 📊 图表总数: ${Object.keys(chartInstances).length}`);
+    console.log(`[PI Dashboard] 📊 图表列表: ${Object.keys(chartInstances).join(', ')}`);
+    console.log(`[PI Dashboard] 🔀 维度切换覆盖: ${Object.keys(DIM_DATA).length} 个图表`);
+    console.log(`[PI Dashboard] 💬 AI助手: 已就绪`);
+    console.log(`[PI Dashboard] 🔍 下钻弹窗: 已预埋`);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+  </script>
+</body>
+</html>
+
