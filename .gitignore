@@ -88,3 +88,8 @@ logs/
 *.pptx
 *.xlsx
 *.csv
+
+# Workspace-local duplicates and unused asset
+/ProcurementAnalysis/
+/dotclone/
+/project_20260411_000342/projects/assets/image.png
