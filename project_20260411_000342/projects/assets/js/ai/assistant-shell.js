@@ -34,6 +34,13 @@ function buildSelectedEntityLabel(selectedEntity) {
   return '';
 }
 
+/**
+ * Build up to four context-aware starter prompts from the current dashboard snapshot.
+ *
+ * @param {object} snapshot Dashboard state snapshot.
+ * @param {string[]} [fallbackSuggestions=DEFAULT_SUGGESTIONS] Default suggestions used when no focus exists.
+ * @returns {string[]}
+ */
 export function createContextAwareSuggestions(snapshot, fallbackSuggestions = DEFAULT_SUGGESTIONS) {
   const selectedEntity = snapshot?.ui?.selectedEntity;
 
@@ -62,6 +69,12 @@ export function createContextAwareSuggestions(snapshot, fallbackSuggestions = DE
   return fallbackSuggestions.slice();
 }
 
+/**
+ * Build a short context hint shown at the top of the assistant panel.
+ *
+ * @param {object} runtimeContext Runtime context derived from the dashboard state bus.
+ * @returns {string}
+ */
 export function buildAssistantContextHint(runtimeContext) {
   const parts = [`当前上下文: ${runtimeContext.activeModule || '首页驾驶舱'}`];
   const selectedEntityLabel = buildSelectedEntityLabel(runtimeContext.selectedEntity);
@@ -142,6 +155,15 @@ function isDomContainer(node) {
   return Boolean(node && typeof node.appendChild === 'function' && typeof node.querySelector === 'function');
 }
 
+/**
+ * Create a sender that forwards assistant prompts to the backend proxy.
+ *
+ * @param {object} [options]
+ * @param {string} [options.endpoint] Proxy endpoint URL.
+ * @param {Function} [options.getAuthToken] Token resolver used before each request.
+ * @param {Function} [options.fetchImpl] Fetch implementation for production or tests.
+ * @returns {Function}
+ */
 export function createProxyMessageSender({
   endpoint = 'http://localhost:3000/api/ai-proxy/chat',
   getAuthToken = () => (typeof window !== 'undefined' ? window.__AI_JWT__ : null),
@@ -170,6 +192,17 @@ export function createProxyMessageSender({
   };
 }
 
+/**
+ * Create the floating assistant shell that binds UI state, privacy gating, and messaging.
+ *
+ * @param {object} [options]
+ * @param {object} options.stateBus Dashboard state bus used to derive runtime context.
+ * @param {object} [options.mountNode] DOM-like container or headless target for rendering.
+ * @param {object|null} [options.privacyGate] Consent gate checked before open/send actions.
+ * @param {Function} [options.onSendMessage] Message handler invoked with the runtime context.
+ * @param {string[]} [options.suggestions] Default suggestion labels.
+ * @returns {{mount: Function, destroy: Function, open: Function, close: Function, sendMessage: Function, getState: Function}}
+ */
 export function createAssistantShell({
   stateBus,
   mountNode,
@@ -418,6 +451,12 @@ export function createAssistantShell({
   return api;
 }
 
+/**
+ * Boot the assistant shell on document.body and return the mounted API.
+ *
+ * @param {object} [options]
+ * @returns {{mount: Function, destroy: Function, open: Function, close: Function, sendMessage: Function, getState: Function}}
+ */
 export function bootAssistantShell(options = {}) {
   const shell = createAssistantShell({
     mountNode: document.body,

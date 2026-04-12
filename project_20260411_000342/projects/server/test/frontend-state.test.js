@@ -12,6 +12,59 @@ import { createAiPrivacyGate } from '../../assets/js/ai/privacy-gate.js';
 
 const projectRoot = path.resolve(import.meta.dirname, '../..');
 
+function createClassListDouble() {
+  const classNames = new Set();
+
+  return {
+    toggle(className, force) {
+      if (force) {
+        classNames.add(className);
+        return;
+      }
+
+      classNames.delete(className);
+    },
+    contains(className) {
+      return classNames.has(className);
+    }
+  };
+}
+
+function createAssistantDomMount() {
+  const refs = {
+    '#ai-assistant-wrapper': {},
+    '#ai-panel': {
+      style: { display: 'none' },
+      classList: createClassListDouble()
+    },
+    '#ai-messages': {
+      innerHTML: '',
+      scrollTop: 0,
+      scrollHeight: 160
+    },
+    '#ai-input': {
+      focusCount: 0,
+      focus() {
+        this.focusCount += 1;
+      }
+    },
+    '#ai-context-hint': {
+      textContent: ''
+    },
+    '#ai-suggestions': {
+      innerHTML: ''
+    }
+  };
+
+  return {
+    refs,
+    appendChild() {},
+    querySelector(selector) {
+      return refs[selector] || null;
+    }
+  };
+}
+
 test('dashboard state bus updates snapshots and notifies subscribers with cloned state', () => {
   const stateBus = createDashboardStateBus({
     initialState: createInitialDashboardState({
@@ -264,6 +317,35 @@ test('assistant shell open respects the privacy gate before showing the panel', 
   allowed = true;
   assert.equal(await shell.open(), true);
   assert.equal(shell.getState().open, true);
+});
+
+test('assistant shell open renders a visible panel for DOM mounts', async () => {
+  const stateBus = createDashboardStateBus({
+    initialState: createInitialDashboardState({
+      ui: {
+        activeTab: 'tab2',
+        activeModule: '支出分析'
+      }
+    })
+  });
+  const mountNode = createAssistantDomMount();
+  const shell = createAssistantShell({
+    stateBus,
+    mountNode
+  });
+
+  assert.equal(await shell.open(), true);
+  assert.equal(shell.getState().open, true);
+  assert.equal(mountNode.refs['#ai-panel'].style.display, 'flex');
+  assert.equal(mountNode.refs['#ai-panel'].classList.contains('show'), true);
+  assert.match(mountNode.refs['#ai-context-hint'].textContent, /支出分析/);
+  assert.match(mountNode.refs['#ai-messages'].innerHTML, /采购智能助手/);
+  assert.match(mountNode.refs['#ai-suggestions'].innerHTML, /本周最差 3 项指标/);
+  assert.equal(mountNode.refs['#ai-input'].focusCount, 1);
+
+  shell.close();
+  assert.equal(mountNode.refs['#ai-panel'].style.display, 'none');
+  assert.equal(mountNode.refs['#ai-panel'].classList.contains('show'), false);
 });
 
 test('proxy message sender posts auth header and runtime context to ai-proxy', async () => {

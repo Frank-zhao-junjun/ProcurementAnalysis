@@ -70,6 +70,42 @@ function formatInputValue(field, value) {
   return String(Math.round(numeric));
 }
 
+function hasMeaningfulValueChange(field, currentValue, nextValue) {
+  return formatInputValue(field, currentValue) !== formatInputValue(field, nextValue);
+}
+
+function isWhatIfFieldTarget(node, mountNode) {
+  if (!node) {
+    return false;
+  }
+
+  if (node.dataset && Object.prototype.hasOwnProperty.call(node.dataset, 'whatifField')) {
+    return true;
+  }
+
+  if (typeof mountNode?.querySelectorAll === 'function') {
+    return Array.from(mountNode.querySelectorAll('[data-whatif-field]')).includes(node);
+  }
+
+  return typeof node.matches === 'function' && node.matches('[data-whatif-field]');
+}
+
+function isRunActivationTarget(node, mountNode) {
+  if (!node) {
+    return false;
+  }
+
+  if (node.dataset && Object.prototype.hasOwnProperty.call(node.dataset, 'whatifRun')) {
+    return true;
+  }
+
+  if (typeof mountNode?.querySelector === 'function' && node === mountNode.querySelector('[data-whatif-run]')) {
+    return true;
+  }
+
+  return typeof node.matches === 'function' && node.matches('[data-whatif-run]');
+}
+
 function buildFallbackExplanation(result) {
   return result ? TEMPLATE_EXPLAINER(result) : '运行模拟后将在此展示情景解释。';
 }
@@ -269,6 +305,19 @@ function createPanelMarkup(state, scenario) {
     </div>`;
 }
 
+/**
+ * Create a What-if panel controller bound to a mount node.
+ * The controller owns form state, validation, rendering, and simulation runs
+ * for the configured scenario.
+ *
+ * @param {object} options
+ * @param {object} options.mountNode DOM-like container that exposes query helpers.
+ * @param {object} [options.baselineSnapshot] Static baseline snapshot for simulations.
+ * @param {Function} [options.baselineSnapshotFactory] Lazy snapshot resolver used at run time.
+ * @param {string} [options.scenarioId] Scenario identifier registered in the scenario registry.
+ * @param {Function|object} [options.explainer] Explanation provider function or object.
+ * @returns {{getState: Function, render: Function, runSimulation: Function}}
+ */
 export function createWhatIfPanelController({
   mountNode,
   baselineSnapshot,
@@ -291,6 +340,8 @@ export function createWhatIfPanelController({
   };
   const activeExplainer = resolveExplainerHandler(explainer);
   let latestRunToken = 0;
+  let hasQueuedFocusTransferRun = false;
+  const fieldFocusValues = new Map();
 
   function resetDerivedState() {
     state.result = null;
@@ -368,6 +419,39 @@ export function createWhatIfPanelController({
     return true;
   }
 
+  /**
+   * Launch a simulation using the latest live DOM values.
+   * This keeps pointer/focus timing differences from dropping the user's intent.
+   */
+  function startRunFromDom() {
+    if (state.status === 'running') {
+      return;
+    }
+
+    void runSimulation(readLiveParamsFromMountNode()).catch(() => {});
+  }
+
+  /**
+   * Defer a run until the current focus transfer settles.
+   * This is the fallback used when blur/change commits happen without a reliable click.
+   */
+  function queueFocusTransferRun() {
+    if (hasQueuedFocusTransferRun) {
+      return;
+    }
+
+    hasQueuedFocusTransferRun = true;
+
+    const schedule = typeof queueMicrotask === 'function'
+      ? queueMicrotask
+      : (callback) => Promise.resolve().then(callback);
+
+    schedule(() => {
+      hasQueuedFocusTransferRun = false;
+      startRunFromDom();
+    });
+  }
+
   function render() {
     mountNode.innerHTML = createPanelMarkup(state, scenario);
 
@@ -376,8 +460,37 @@ export function createWhatIfPanelController({
     }
 
     mountNode.querySelectorAll('[data-whatif-field]').forEach((input) => {
+      input.addEventListener('focusin', (event) => {
+        fieldFocusValues.set(event.target.name, formatInputValue(event.target.name, event.target.value));
+      });
+
+      input.addEventListener('focusout', (event) => {
+        const { name, value } = event.target;
+        const baselineValue = fieldFocusValues.has(name)
+          ? fieldFocusValues.get(name)
+          : formatInputValue(name, state.params[name]);
+
+        fieldFocusValues.delete(name);
+
+        if (isWhatIfFieldTarget(event.relatedTarget, mountNode)) {
+          return;
+        }
+
+        if (formatInputValue(name, value) === baselineValue) {
+          return;
+        }
+
+        queueFocusTransferRun();
+      });
+
       input.addEventListener('change', (event) => {
         const { name, value } = event.target;
+
+        if (!hasMeaningfulValueChange(name, state.params[name], value)) {
+          patchRenderedState();
+          return;
+        }
+
         invalidatePendingRun();
         state.params[name] = value;
         resetDerivedState();
@@ -392,14 +505,8 @@ export function createWhatIfPanelController({
       : null;
 
     if (runButton) {
-      const triggerRunFromDom = () => {
-        void runSimulation(readLiveParamsFromMountNode()).catch(() => {});
-      };
-
-      runButton.addEventListener('pointerdown', triggerRunFromDom);
-      runButton.addEventListener('click', () => {
-        triggerRunFromDom();
-      });
+      runButton.addEventListener('pointerdown', startRunFromDom);
+      runButton.addEventListener('click', startRunFromDom);
     }
   }
 
@@ -469,6 +576,16 @@ export function createWhatIfPanelController({
   };
 }
 
+/**
+ * Mount the What-if panel for the default purchase ratio scenario.
+ *
+ * @param {object} [options]
+ * @param {object} [options.mountNode] DOM-like container that will receive the panel markup.
+ * @param {Function} [options.baselineSnapshotFactory] Lazy baseline snapshot resolver.
+ * @param {object} [options.baselineSnapshot] Static baseline snapshot.
+ * @param {Function|object} [options.explainer] Explanation provider.
+ * @returns {{getState: Function, render: Function, runSimulation: Function}|null}
+ */
 export function bootWhatIfPanel({ mountNode, baselineSnapshotFactory, baselineSnapshot, explainer } = {}) {
   if (!mountNode) {
     return null;

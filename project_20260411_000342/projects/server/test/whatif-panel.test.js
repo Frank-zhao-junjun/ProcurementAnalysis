@@ -34,28 +34,29 @@ function createInteractiveMountNode() {
   const fields = new Map();
   let innerHTML = '';
 
-  function createElement(name = '') {
+  function createElement(name = '', options = {}) {
     const elementListeners = new Map();
 
     return {
       name,
       value: '',
+      dataset: options.dataset || {},
       addEventListener(eventName, handler) {
         elementListeners.set(eventName, handler);
       },
-      dispatch(eventName) {
+      dispatch(eventName, eventInit = {}) {
         const handler = elementListeners.get(eventName);
 
         if (!handler) {
           throw new Error(`No listener registered for ${eventName}`);
         }
 
-        return handler({ target: this });
+        return handler({ target: this, currentTarget: this, ...eventInit });
       }
     };
   }
 
-  const runButton = createElement();
+  const runButton = createElement('', { dataset: { whatifRun: '' } });
   const inputNames = [
     'currentSpotRatio',
     'targetSpotRatio',
@@ -97,20 +98,21 @@ function createRerenderingMountNode() {
   let currentRunButton = null;
   const currentFields = new Map();
 
-  function createElement(name = '') {
+  function createElement(name = '', options = {}) {
     const elementListeners = new Map();
     let active = true;
 
     return {
       name,
       value: '',
+      dataset: options.dataset || {},
       addEventListener(eventName, handler) {
         elementListeners.set(eventName, handler);
       },
       deactivate() {
         active = false;
       },
-      dispatch(eventName) {
+      dispatch(eventName, eventInit = {}) {
         if (!active) {
           return undefined;
         }
@@ -121,7 +123,7 @@ function createRerenderingMountNode() {
           throw new Error(`No listener registered for ${eventName}`);
         }
 
-        return handler({ target: this });
+        return handler({ target: this, currentTarget: this, ...eventInit });
       }
     };
   }
@@ -137,7 +139,7 @@ function createRerenderingMountNode() {
     ['currentSpotRatio', 'targetSpotRatio', 'currentSpotPrice', 'contractPrice', 'monthlyVolume']
       .forEach((name) => currentFields.set(name, createElement(name)));
 
-    currentRunButton = createElement();
+    currentRunButton = createElement('', { dataset: { whatifRun: '' } });
   }
 
   refreshInteractiveNodes();
@@ -412,4 +414,44 @@ test('pointer activation runs the latest DOM value before blur rerender can repl
   assert.equal(state.params.targetSpotRatio, '0.2');
   assert.equal(state.result?.metrics.quarterlySavingWan, 480);
   assert.match(state.explanation, /^1\. 结论/m);
+});
+
+test('blur change after pointer activation does not cancel the launched simulation', async () => {
+  const mountNode = createInteractiveMountNode();
+  const controller = createWhatIfPanelController({
+    mountNode,
+    baselineSnapshot: { activeTab: 'tab2', activeModule: '支出分析' }
+  });
+
+  mountNode.fields.get('targetSpotRatio').value = '0.2';
+  mountNode.runButton.dispatch('pointerdown');
+  mountNode.fields.get('targetSpotRatio').dispatch('change');
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  const state = controller.getState();
+  assert.equal(state.status, 'ready');
+  assert.equal(state.params.targetSpotRatio, '0.2');
+  assert.equal(state.result?.metrics.quarterlySavingWan, 480);
+});
+
+test('leaving a changed field to a non-input target still launches the simulation when click is swallowed', async () => {
+  const mountNode = createInteractiveMountNode();
+  const controller = createWhatIfPanelController({
+    mountNode,
+    baselineSnapshot: { activeTab: 'tab2', activeModule: '支出分析' }
+  });
+
+  const targetField = mountNode.fields.get('targetSpotRatio');
+  targetField.dispatch('focusin');
+  targetField.value = '0.2';
+  targetField.dispatch('change');
+  targetField.dispatch('focusout', { relatedTarget: null });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  const state = controller.getState();
+  assert.equal(state.status, 'ready');
+  assert.equal(state.params.targetSpotRatio, '0.2');
+  assert.equal(state.result?.metrics.quarterlySavingWan, 480);
 });
