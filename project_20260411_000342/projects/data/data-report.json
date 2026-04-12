@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-04-12T10:23:21.098Z",
+  "summary": {
+    "totalOrders": 2400,
+    "totalAmount": 4257090721,
+    "totalAmountWan": 425709,
+    "totalAmountYi": 42.57,
+    "avgOrderAmount": 1773788,
+    "dateRange": {
+      "start": "2024-01-01",
+      "end": "2025-12-01"
+    }
+  },
+  "distributions": {
+    "byCategory": {
+      "PLASTIC": 608,
+      "ELECTRONIC": 364,
+      "STEEL": 961,
+      "ALUMINUM": 280,
+      "RUBBER": 187
+    },
+    "byOrderType": {
+      "长约": 1391,
+      "现货": 1009
+    },
+    "byOrganization": {
+      "SUB_ENG": 371,
+      "BU_WV": 1377,
+      "SUB_CHS": 362,
+      "SUB_GBX": 290
+    }
+  },
+  "suppliers": {
+    "count": 20,
+    "longTermCount": 14,
+    "spotCount": 6,
+    "avgPerformance": 91
+  },
+  "inventory": {
+    "totalRecords": 456,
+    "stockoutCount": 6,
+    "vmiCount": 192
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 0,
+    "passed": 21,
+    "status": "PASSED"
+  }
+}

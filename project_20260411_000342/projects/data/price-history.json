@@ -1,0 +1,367 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-04-12",
+  "description": "2024-2025年5大品类价格历史，基于真实大宗商品走势",
+  "timeRange": {
+    "start": "2024-01",
+    "end": "2025-12",
+    "totalMonths": 24
+  },
+  "basePrices": {
+    "STEEL": {
+      "基准价": 4600,
+      "波动区间": [4000, 5200],
+      "趋势": "缓慢上涨+季节性波动",
+      "长约折扣": 0.95
+    },
+    "PLASTIC": {
+      "基准价": 8500,
+      "波动区间": [7500, 9500],
+      "趋势": "跟随原油价格",
+      "长约折扣": 0.97
+    },
+    "ELECTRONIC": {
+      "基准价": 100,
+      "波动区间": [80, 150],
+      "趋势": "芯片短缺期上涨",
+      "长约折扣": 0.90
+    },
+    "ALUMINUM": {
+      "基准价": 18500,
+      "波动区间": [16500, 21000],
+      "趋势": "跟随LME铝价",
+      "长约折扣": 0.96
+    },
+    "RUBBER": {
+      "基准价": 13500,
+      "波动区间": [12000, 15500],
+      "趋势": "季节性明显",
+      "长约折扣": 0.98
+    }
+  },
+  "priceHistory": [
+    {
+      "date": "2024-01",
+      "year": 2024,
+      "month": 1,
+      "prices": {
+        "STEEL": { "spot": 4120, "contract": 3914, "changeMoM": 0 },
+        "PLASTIC": { "spot": 7800, "contract": 7566, "changeMoM": 0 },
+        "ELECTRONIC": { "spot": 95, "contract": 85.5, "changeMoM": 0 },
+        "ALUMINUM": { "spot": 17200, "contract": 16512, "changeMoM": 0 },
+        "RUBBER": { "spot": 12500, "contract": 12250, "changeMoM": 0 }
+      },
+      "note": "年初开局平稳"
+    },
+    {
+      "date": "2024-02",
+      "year": 2024,
+      "month": 2,
+      "prices": {
+        "STEEL": { "spot": 4080, "contract": 3914, "changeMoM": -0.97 },
+        "PLASTIC": { "spot": 7750, "contract": 7566, "changeMoM": -0.64 },
+        "ELECTRONIC": { "spot": 98, "contract": 85.5, "changeMoM": 3.16 },
+        "ALUMINUM": { "spot": 17500, "contract": 16512, "changeMoM": 1.74 },
+        "RUBBER": { "spot": 12800, "contract": 12250, "changeMoM": 2.4 }
+      },
+      "note": "春节后电子元件需求上升"
+    },
+    {
+      "date": "2024-03",
+      "year": 2024,
+      "month": 3,
+      "prices": {
+        "STEEL": { "spot": 4250, "contract": 3914, "changeMoM": 4.17 },
+        "PLASTIC": { "spot": 7950, "contract": 7566, "changeMoM": 2.58 },
+        "ELECTRONIC": { "spot": 102, "contract": 85.5, "changeMoM": 4.08 },
+        "ALUMINUM": { "spot": 18200, "contract": 16512, "changeMoM": 4.0 },
+        "RUBBER": { "spot": 13200, "contract": 12250, "changeMoM": 3.13 }
+      },
+      "note": "金三银四，需求旺季"
+    },
+    {
+      "date": "2024-04",
+      "year": 2024,
+      "month": 4,
+      "prices": {
+        "STEEL": { "spot": 4380, "contract": 4180, "changeMoM": 3.06 },
+        "PLASTIC": { "spot": 8200, "contract": 7954, "changeMoM": 3.14 },
+        "ELECTRONIC": { "spot": 105, "contract": 94.5, "changeMoM": 2.94 },
+        "ALUMINUM": { "spot": 18800, "contract": 17328, "changeMoM": 3.3 },
+        "RUBBER": { "spot": 13800, "contract": 12522, "changeMoM": 4.55 }
+      },
+      "note": "Q2长约重新议价，长约价上调"
+    },
+    {
+      "date": "2024-05",
+      "year": 2024,
+      "month": 5,
+      "prices": {
+        "STEEL": { "spot": 4520, "contract": 4180, "changeMoM": 3.2 },
+        "PLASTIC": { "spot": 8450, "contract": 7954, "changeMoM": 3.05 },
+        "ELECTRONIC": { "spot": 108, "contract": 94.5, "changeMoM": 2.86 },
+        "ALUMINUM": { "spot": 19500, "contract": 17328, "changeMoM": 3.72 },
+        "RUBBER": { "spot": 14200, "contract": 12522, "changeMoM": 2.9 }
+      },
+      "note": "新能源车产量上升，需求强劲"
+    },
+    {
+      "date": "2024-06",
+      "year": 2024,
+      "month": 6,
+      "prices": {
+        "STEEL": { "spot": 4680, "contract": 4180, "changeMoM": 3.54 },
+        "PLASTIC": { "spot": 8650, "contract": 7954, "changeMoM": 2.37 },
+        "ELECTRONIC": { "spot": 112, "contract": 94.5, "changeMoM": 3.7 },
+        "ALUMINUM": { "spot": 19800, "contract": 17328, "changeMoM": 1.54 },
+        "RUBBER": { "spot": 14500, "contract": 12522, "changeMoM": 2.11 }
+      },
+      "note": "年中高点，钢铁涨幅最大"
+    },
+    {
+      "date": "2024-07",
+      "year": 2024,
+      "month": 7,
+      "prices": {
+        "STEEL": { "spot": 4580, "contract": 4180, "changeMoM": -2.14 },
+        "PLASTIC": { "spot": 8550, "contract": 7954, "changeMoM": -1.16 },
+        "ELECTRONIC": { "spot": 115, "contract": 94.5, "changeMoM": 2.68 },
+        "ALUMINUM": { "spot": 19200, "contract": 17328, "changeMoM": -3.03 },
+        "RUBBER": { "spot": 13800, "contract": 12522, "changeMoM": -4.83 }
+      },
+      "note": "夏季传统淡季，价格回调"
+    },
+    {
+      "date": "2024-08",
+      "year": 2024,
+      "month": 8,
+      "prices": {
+        "STEEL": { "spot": 4450, "contract": 4180, "changeMoM": -2.84 },
+        "PLASTIC": { "spot": 8400, "contract": 7954, "changeMoM": -1.75 },
+        "ELECTRONIC": { "spot": 118, "contract": 94.5, "changeMoM": 2.61 },
+        "ALUMINUM": { "spot": 18800, "contract": 17328, "changeMoM": -2.08 },
+        "RUBBER": { "spot": 13200, "contract": 12522, "changeMoM": -4.35 }
+      },
+      "note": "芯片持续涨价，其他品类下跌"
+    },
+    {
+      "date": "2024-09",
+      "year": 2024,
+      "month": 9,
+      "prices": {
+        "STEEL": { "spot": 4520, "contract": 4400, "changeMoM": 1.57 },
+        "PLASTIC": { "spot": 8550, "contract": 8293, "changeMoM": 1.79 },
+        "ELECTRONIC": { "spot": 120, "contract": 108, "changeMoM": 1.69 },
+        "ALUMINUM": { "spot": 19200, "contract": 18048, "changeMoM": 2.13 },
+        "RUBBER": { "spot": 13500, "contract": 12870, "changeMoM": 2.27 }
+      },
+      "note": "金九银十，Q3长约上调"
+    },
+    {
+      "date": "2024-10",
+      "year": 2024,
+      "month": 10,
+      "prices": {
+        "STEEL": { "spot": 4650, "contract": 4400, "changeMoM": 2.88 },
+        "PLASTIC": { "spot": 8720, "contract": 8293, "changeMoM": 1.99 },
+        "ELECTRONIC": { "spot": 122, "contract": 108, "changeMoM": 1.67 },
+        "ALUMINUM": { "spot": 19800, "contract": 18048, "changeMoM": 3.13 },
+        "RUBBER": { "spot": 14200, "contract": 12870, "changeMoM": 5.19 }
+      },
+      "note": "旺季需求爆发，橡胶涨幅最大"
+    },
+    {
+      "date": "2024-11",
+      "year": 2024,
+      "month": 11,
+      "prices": {
+        "STEEL": { "spot": 4780, "contract": 4400, "changeMoM": 2.8 },
+        "PLASTIC": { "spot": 8850, "contract": 8293, "changeMoM": 1.49 },
+        "ELECTRONIC": { "spot": 125, "contract": 108, "changeMoM": 2.46 },
+        "ALUMINUM": { "spot": 20200, "contract": 18048, "changeMoM": 2.02 },
+        "RUBBER": { "spot": 14800, "contract": 12870, "changeMoM": 4.23 }
+      },
+      "note": "年底备货，价格持续上涨"
+    },
+    {
+      "date": "2024-12",
+      "year": 2024,
+      "month": 12,
+      "prices": {
+        "STEEL": { "spot": 4820, "contract": 4400, "changeMoM": 0.84 },
+        "PLASTIC": { "spot": 8920, "contract": 8293, "changeMoM": 0.79 },
+        "ELECTRONIC": { "spot": 128, "contract": 108, "changeMoM": 2.4 },
+        "ALUMINUM": { "spot": 20500, "contract": 18048, "changeMoM": 1.49 },
+        "RUBBER": { "spot": 15200, "contract": 12870, "changeMoM": 2.7 }
+      },
+      "note": "年末平稳，锁定2025长约基准"
+    },
+    {
+      "date": "2025-01",
+      "year": 2025,
+      "month": 1,
+      "prices": {
+        "STEEL": { "spot": 4750, "contract": 4750, "changeMoM": -1.45 },
+        "PLASTIC": { "spot": 8800, "contract": 8800, "changeMoM": -1.35 },
+        "ELECTRONIC": { "spot": 130, "contract": 117, "changeMoM": 1.56 },
+        "ALUMINUM": { "spot": 20200, "contract": 19488, "changeMoM": -1.46 },
+        "RUBBER": { "spot": 14800, "contract": 14800, "changeMoM": -2.63 }
+      },
+      "note": "2025年开局，长约重新锁定，电子元件继续上涨"
+    },
+    {
+      "date": "2025-02",
+      "year": 2025,
+      "month": 2,
+      "prices": {
+        "STEEL": { "spot": 4680, "contract": 4750, "changeMoM": -1.47 },
+        "PLASTIC": { "spot": 8650, "contract": 8800, "changeMoM": -1.7 },
+        "ELECTRONIC": { "spot": 132, "contract": 117, "changeMoM": 1.54 },
+        "ALUMINUM": { "spot": 19800, "contract": 19488, "changeMoM": -1.98 },
+        "RUBBER": { "spot": 14200, "contract": 14800, "changeMoM": -4.05 }
+      },
+      "note": "春节后回调，芯片持续短缺"
+    },
+    {
+      "date": "2025-03",
+      "year": 2025,
+      "month": 3,
+      "prices": {
+        "STEEL": { "spot": 4850, "contract": 4750, "changeMoM": 3.63 },
+        "PLASTIC": { "spot": 8950, "contract": 8800, "changeMoM": 3.47 },
+        "ELECTRONIC": { "spot": 138, "contract": 117, "changeMoM": 4.55 },
+        "ALUMINUM": { "spot": 20800, "contract": 19488, "changeMoM": 5.05 },
+        "RUBBER": { "spot": 14800, "contract": 14800, "changeMoM": 4.23 }
+      },
+      "note": "金三银四，全面上涨，电子元件涨幅最大"
+    },
+    {
+      "date": "2025-04",
+      "year": 2025,
+      "month": 4,
+      "prices": {
+        "STEEL": { "spot": 4980, "contract": 4980, "changeMoM": 2.68 },
+        "PLASTIC": { "spot": 9150, "contract": 9150, "changeMoM": 2.23 },
+        "ELECTRONIC": { "spot": 142, "contract": 127.8, "changeMoM": 2.9 },
+        "ALUMINUM": { "spot": 21500, "contract": 20352, "changeMoM": 3.37 },
+        "RUBBER": { "spot": 15500, "contract": 15015, "changeMoM": 4.73 }
+      },
+      "note": "Q2长约上调，现货价突破5000(钢)/9000(塑料)"
+    },
+    {
+      "date": "2025-05",
+      "year": 2025,
+      "month": 5,
+      "prices": {
+        "STEEL": { "spot": 5080, "contract": 4980, "changeMoM": 2.01 },
+        "PLASTIC": { "spot": 9280, "contract": 9150, "changeMoM": 1.42 },
+        "ELECTRONIC": { "spot": 145, "contract": 127.8, "changeMoM": 2.11 },
+        "ALUMINUM": { "spot": 21800, "contract": 20352, "changeMoM": 1.4 },
+        "RUBBER": { "spot": 15200, "contract": 15015, "changeMoM": -1.94 }
+      },
+      "note": "钢材突破5000，电子元件创新高"
+    },
+    {
+      "date": "2025-06",
+      "year": 2025,
+      "month": 6,
+      "prices": {
+        "STEEL": { "spot": 5120, "contract": 4980, "changeMoM": 0.79 },
+        "PLASTIC": { "spot": 9350, "contract": 9150, "changeMoM": 0.75 },
+        "ELECTRONIC": { "spot": 148, "contract": 127.8, "changeMoM": 2.07 },
+        "ALUMINUM": { "spot": 22000, "contract": 20352, "changeMoM": 0.92 },
+        "RUBBER": { "spot": 14800, "contract": 15015, "changeMoM": -2.63 }
+      },
+      "note": "2025年中，钢材达到本轮高点5120，电子元件逼近150"
+    },
+    {
+      "date": "2025-07",
+      "year": 2025,
+      "month": 7,
+      "prices": {
+        "STEEL": { "spot": 5050, "contract": 4980, "changeMoM": -1.37 },
+        "PLASTIC": { "spot": 9250, "contract": 9150, "changeMoM": -1.07 },
+        "ELECTRONIC": { "spot": 145, "contract": 127.8, "changeMoM": -2.03 },
+        "ALUMINUM": { "spot": 21500, "contract": 20352, "changeMoM": -2.27 },
+        "RUBBER": { "spot": 14200, "contract": 15015, "changeMoM": -4.05 }
+      },
+      "note": "夏季回调，除芯片外普遍下跌"
+    },
+    {
+      "date": "2025-08",
+      "year": 2025,
+      "month": 8,
+      "prices": {
+        "STEEL": { "spot": 4980, "contract": 4980, "changeMoM": -1.39 },
+        "PLASTIC": { "spot": 9150, "contract": 9150, "changeMoM": -1.08 },
+        "ELECTRONIC": { "spot": 140, "contract": 127.8, "changeMoM": -3.45 },
+        "ALUMINUM": { "spot": 21000, "contract": 20352, "changeMoM": -2.33 },
+        "RUBBER": { "spot": 13800, "contract": 15015, "changeMoM": -2.82 }
+      },
+      "note": "芯片价格开始回落，市场全面调整"
+    },
+    {
+      "date": "2025-09",
+      "year": 2025,
+      "month": 9,
+      "prices": {
+        "STEEL": { "spot": 5080, "contract": 5080, "changeMoM": 2.01 },
+        "PLASTIC": { "spot": 9250, "contract": 9150, "changeMoM": 1.09 },
+        "ELECTRONIC": { "spot": 138, "contract": 124.2, "changeMoM": -1.43 },
+        "ALUMINUM": { "spot": 21500, "contract": 20640, "changeMoM": 2.38 },
+        "RUBBER": { "spot": 14500, "contract": 14500, "changeMoM": 5.07 }
+      },
+      "note": "Q3长约上调，芯片继续回落"
+    },
+    {
+      "date": "2025-10",
+      "year": 2025,
+      "month": 10,
+      "prices": {
+        "STEEL": { "spot": 5180, "contract": 5080, "changeMoM": 1.97 },
+        "PLASTIC": { "spot": 9380, "contract": 9150, "changeMoM": 1.41 },
+        "ELECTRONIC": { "spot": 135, "contract": 124.2, "changeMoM": -2.17 },
+        "ALUMINUM": { "spot": 22000, "contract": 20640, "changeMoM": 2.33 },
+        "RUBBER": { "spot": 15200, "contract": 14500, "changeMoM": 4.83 }
+      },
+      "note": "旺季需求，钢材逼近5200高点"
+    },
+    {
+      "date": "2025-11",
+      "year": 2025,
+      "month": 11,
+      "prices": {
+        "STEEL": { "spot": 5150, "contract": 5080, "changeMoM": -0.58 },
+        "PLASTIC": { "spot": 9450, "contract": 9150, "changeMoM": 0.75 },
+        "ELECTRONIC": { "spot": 132, "contract": 124.2, "changeMoM": -2.22 },
+        "ALUMINUM": { "spot": 21800, "contract": 20640, "changeMoM": -0.91 },
+        "RUBBER": { "spot": 14800, "contract": 14500, "changeMoM": -2.63 }
+      },
+      "note": "年底平稳，芯片回归理性"
+    },
+    {
+      "date": "2025-12",
+      "year": 2025,
+      "month": 12,
+      "prices": {
+        "STEEL": { "spot": 5080, "contract": 5080, "changeMoM": -1.36 },
+        "PLASTIC": { "spot": 9280, "contract": 9150, "changeMoM": -1.8 },
+        "ELECTRONIC": { "spot": 128, "contract": 124.2, "changeMoM": -3.03 },
+        "ALUMINUM": { "spot": 21200, "contract": 20640, "changeMoM": -2.75 },
+        "RUBBER": { "spot": 14200, "contract": 14500, "changeMoM": -4.05 }
+      },
+      "note": "2025年末收官，全年钢材涨幅23%，芯片涨幅30%"
+    }
+  ],
+  "summary": {
+    "totalRecords": 24,
+    "timeSpan": "2024-01 至 2025-12",
+    "priceChange2024to2025": {
+      "STEEL": { "start": 4120, "end": 5080, "change": 23.3 },
+      "PLASTIC": { "start": 7800, "end": 9280, "change": 19.0 },
+      "ELECTRONIC": { "start": 95, "end": 128, "change": 34.7 },
+      "ALUMINUM": { "start": 17200, "end": 21200, "change": 23.3 },
+      "RUBBER": { "start": 12500, "end": 14200, "change": 13.6 }
+    }
+  }
+}
