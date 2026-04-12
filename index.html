@@ -71,30 +71,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .kpi-card.green .kpi-value{color:var(--accent-green)}
 .kpi-card.purple .kpi-value{color:var(--accent-purple)}
 
-/* ===== Alert Panel (NEW) ===== */
-.alert-panel{background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(245,158,11,.04));border:1px solid rgba(239,68,68,.15);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px}
-.alert-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.alert-panel-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
-.alert-icon-danger{width:28px;height:28px;border-radius:7px;background:rgba(239,68,68,.15);color:var(--accent-red);display:flex;align-items:center;justify-content:center;font-size:14px}
-.alert-icon-warn{width:28px;height:28px;border-radius:7px;background:rgba(245,158,11,.15);color:var(--accent-gold);display:flex;align-items:center;justify-content:center;font-size:14px}
-.alert-counts{display:flex;gap:16px;font-size:12px}
-.alert-count-item{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px}
-.alert-count-high{background:rgba(239,68,68,.12);color:var(--accent-red);border:1px solid rgba(239,68,68,.25)}
-.alert-count-mid{background:rgba(245,158,11,.12);color:var(--accent-gold);border:1px solid rgba(245,158,11,.25)}
-.alert-count-ok{background:rgba(16,185,129,.12);color:var(--accent-green);border:1px solid rgba(16,185,129,.25)}
-.alert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
-.alert-item{background:rgba(17,24,39,.6);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:12px 14px;cursor:pointer;transition:all .2s}
-.alert-item:hover{border-color:var(--border-active);transform:translateY(-1px)}
-.alert-item.high{border-left:3px solid var(--accent-red)}
-.alert-item.mid{border-left:3px solid var(--accent-gold)}
-.alert-item.ok{border-left:3px solid var(--accent-green)}
-.alert-item-code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:4px}
-.alert-item-title{font-size:13px;font-weight:600;margin-bottom:4px}
-.alert-item-desc{font-size:11.5px;color:var(--text-secondary);line-height:1.5}
-.alert-item-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600;margin-top:6px}
-.badge-high{background:rgba(239,68,68,.15);color:#f87171}.badge-mid{background:rgba(245,158,11,.15);color:#fbbf24}.badge-ok{background:rgba(16,185,129,.15);color:#34d399}
-
-/* ===== Ranking Panel (NEW) ===== */
+    /* ===== Ranking Panel (NEW) ===== */
 .ranking-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:16px}
 .ranking-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:18px}
 .ranking-card-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px}
@@ -240,7 +217,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   .grid-2{grid-template-columns:1fr}
   .grid-2-1{grid-template-columns:1fr}
   .ranking-grid{grid-template-columns:1fr}
-  .alert-grid{grid-template-columns:1fr}
   .chart-container.lg{height:300px}
 }
 @media(max-width:1000px){
@@ -332,28 +308,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
       </div>
     </div>
 
-    <!-- ===== 预警摘要面板 (6条P0规则) ===== -->
-    <div class="alert-panel">
-      <div class="alert-panel-header">
-        <div class="alert-panel-title">
-          <span class="alert-icon-danger">&#128680;</span>
-          实时预警监控 — P0规则触发状态
-          <span style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:8px;">数据截止: 2025-01-19 23:59</span>
-        </div>
-        <div class="alert-counts">
-          <span class="alert-count-item alert-count-high">&#128308; 高危 <strong>2</strong></span>
-          <span class="alert-count-item alert-count-mid">&#9888;&#65039; 中危 <strong>2</strong></span>
-          <span class="alert-count-item alert-count-ok">&#9989; 正常 <strong>2</strong></span>
-        </div>
-      </div>
-      <div class="alert-grid p0-alerts-container">
-        <!-- 预警内容将由JavaScript动态加载 -->
-        <div class="alert-loading" style="text-align:center;padding:30px;color:var(--text-muted)">
-          <div class="loading-spinner" style="display:inline-block;width:40px;height:40px;border:3px solid rgba(56,189,248,.2);border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite"></div>
-          <p style="margin-top:12px;font-size:13px">加载预警数据...</p>
-        </div>
-      </div>
-    </div>
+
 
     <!-- ===== 组织排名区 ===== -->
     <div class="ranking-grid">
