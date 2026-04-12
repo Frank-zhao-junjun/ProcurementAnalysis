@@ -693,6 +693,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         </div>
       </div>
     </div>
+
+    <div class="section-block mt-16">
+      <div class="section-title">What-if 模拟引擎 <span class="subtitle">采购比例调整场景 MVP</span></div>
+      <div class="card-panel whatif-panel-shell" id="whatifPanelRoot"></div>
+    </div>
   </section><!-- END tab2 -->
 
 
@@ -1042,6 +1047,7 @@ import { createDashboardStateBus, createInitialDashboardState } from './assets/j
 import { createContextBridge } from './assets/js/ai/context-bridge.js';
 import { bootAssistantShell, createProxyMessageSender } from './assets/js/ai/assistant-shell.js';
 import { createAiPrivacyGate } from './assets/js/ai/privacy-gate.js';
+import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
 
 (function() {
   'use strict';
@@ -1107,6 +1113,17 @@ import { createAiPrivacyGate } from './assets/js/ai/privacy-gate.js';
     getChartDimension: (chartId) => _dimState[chartId] || null
   });
   let assistantShell = null;
+  let whatIfPanel = null;
+
+  function getWhatIfBaselineSnapshot() {
+    const snapshot = dashboardStateBus.getSnapshot();
+
+    return {
+      ...snapshot.ui,
+      activeTab: _activeTab,
+      activeModule: TAB_LABELS[_activeTab] || TAB_LABELS.tabHome
+    };
+  }
 
   function switchTab(tabId) {
     // 更新按钮状态
@@ -2040,8 +2057,22 @@ import { createAiPrivacyGate } from './assets/js/ai/privacy-gate.js';
       privacyGate,
       onSendMessage: sendProxyMessage
     });
+    const whatIfRoot = document.getElementById('whatifPanelRoot');
+    if (whatIfRoot) {
+      whatIfPanel = bootWhatIfPanel({
+        mountNode: whatIfRoot,
+        baselineSnapshotFactory: getWhatIfBaselineSnapshot
+      });
+    }
     createModal();
     bindDrillDownEvents();
+
+    if (whatIfPanel) {
+      window.PIDashboardAI = {
+        ...window.PIDashboardAI,
+        whatIfPanel
+      };
+    }
 
     console.log('[PI Dashboard] ✅ 初始化完成');
     console.log(`[PI Dashboard] 📊 图表总数: ${Object.keys(chartInstances).length}`);
