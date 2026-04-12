@@ -104,7 +104,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .card-panel:has(.data-table) .data-table{min-width:600px}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(56,189,248,.08);flex-wrap:wrap;gap:8px}
 .card-title{font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:6px}
-.card-title .icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:rgba(56,189,248,.12);color:var(--accent-cyan)}
 .card-actions{display:flex;gap:6px}
 .card-action-btn{padding:4px 10px;border:1px solid var(--border-color);border-radius:var(--radius-sm);background:transparent;color:var(--text-muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:inherit}
 .card-action-btn:hover,.card-action-btn.active{border-color:var(--accent-cyan);color:var(--accent-cyan);background:rgba(56,189,248,.08)}
@@ -241,8 +240,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     </div>
   </div>
   <nav class="header-center" id="mainTabs">
-    <button class="tab-btn active" data-tab="tabHome">🏠 驾驶舱</button>
-    <button class="tab-btn" data-tab="tab1">降本分析</button>
+    <button class="tab-btn active" data-tab="tab1">降本分析</button>
     <button class="tab-btn" data-tab="tab2">支出分析</button>
     <button class="tab-btn" data-tab="tab3">价格趋势</button>
     <button class="tab-btn" data-tab="tab4">需求趋势</button>
@@ -259,128 +257,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 <!-- ==================== MAIN CONTENT ==================== -->
 <main class="dashboard-main">
 
-  <!-- ============================================================ -->
-  <!-- TAB HOME: 总监驾驶舱 (30秒判断)                                -->
-  <!-- ============================================================ -->
-  <section class="module-section active" id="tabHome">
-
-    <!-- 核心KPI - 10个关键指标 (数据通过API动态加载) -->
-    <div class="kpi-row">
-      <div class="kpi-card cyan kpi-annual-amount">
-        <div class="kpi-label">年度采购额</div>
-        <div class="kpi-value">--<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">加载中...</span></div>
-      </div>
-      <div class="kpi-card gold kpi-savings">
-        <div class="kpi-label">年度降本额</div>
-        <div class="kpi-value">--<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
-      </div>
-      <div class="kpi-card green kpi-savings-rate">
-        <div class="kpi-label">降本比例</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
-      </div>
-      <div class="kpi-card purple kpi-forecast">
-        <div class="kpi-label">全年预测降本</div>
-        <div class="kpi-value">--<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
-      </div>
-      <div class="kpi-card cyan kpi-execution-rate">
-        <div class="kpi-label">预算执行率</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-target">加载中...</span></div>
-      </div>
-      <div class="kpi-card green kpi-material-cost">
-        <div class="kpi-label">材料成本率</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
-      </div>
-      <div class="kpi-card gold kpi-supplier-performance">
-        <div class="kpi-label">供应商平均绩效</div>
-        <div class="kpi-value">--<span class="unit">分</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
-      </div>
-      <div class="kpi-card purple kpi-delivery-rate">
-        <div class="kpi-label">交付及时率</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
-      </div>
-    </div>
-
-
-
-    <!-- ===== 组织排名区 ===== -->
-    <div class="ranking-grid">
-      <!-- 事业部降本排名 -->
-      <div class="ranking-card">
-        <div class="ranking-card-title"><span style="color:var(--accent-cyan);">&#127942;</span> 事业部降本排名 (按达成率)</div>
-        <ul class="ranking-list bu-ranking">
-          <!-- 排名数据将由JavaScript动态加载 -->
-          <li class="ranking-item" style="justify-content:center;padding:20px;color:var(--text-muted)">
-            <span>加载排名数据...</span>
-          </li>
-        </ul>
-      </div>
-      <!-- 子公司排名 -->
-      <div class="ranking-card">
-        <div class="ranking-card-title"><span style="color:var(--accent-purple);">&#127970;</span> 子公司降本排名 (按达成率)</div>
-        <ul class="ranking-list subsidiary-ranking">
-          <!-- 排名数据将由JavaScript动态加载 -->
-          <li class="ranking-item" style="justify-content:center;padding:20px;color:var(--text-muted)">
-            <span>加载排名数据...</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 决策摘要 -->
-    <div class="insight-box">
-      <div class="insight-icon">&#128161;</div>
-      <div class="insight-content">
-        <div class="insight-title">总监决策摘要 — 本周重点关注事项</div>
-        <div class="insight-desc">
-          <strong class="text-red">&#9888; 紧急：</strong>钢材采购价偏离市场+5.8%，建议本周启动与宝武/鞍钢的价格复议谈判；塑料粒子库存仅12.8天需紧急补货。<br/>
-          <strong class="text-gold">&#128176; 重要：</strong>事业部3支出突增(+28.4% YoY)，需核实是否为新项目一次性投入还是持续性超支；利安德巴塞尔交付率降至87.2%需约谈改进。<br/>
-          <strong class="text-green">&#9989; 正常推进：</strong>全年预测降本3.26亿(达成率93.1%)，Q4月均提速至3200万；长约覆盖率提升至58.6%(+8.2pp)；VMI覆盖率34.2%仍有较大优化空间。
-        </div>
-      </div>
-    </div>
-
-    <!-- 快速下钻入口 -->
-    <div class="section-block mt-16">
-      <div class="section-title">专题分析快速入口</div>
-      <div class="grid-4">
-        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab1')">
-          <div style="font-size:32px;margin-bottom:10px;">&#128176;</div>
-          <div style="font-size:14px;font-weight:600;">降本分析</div>
-          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">采购额 / 降本额 / 品类明细</div>
-        </div>
-        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab2')">
-          <div style="font-size:32px;margin-bottom:10px;">&#128200;</div>
-          <div style="font-size:14px;font-weight:600;">支出分析</div>
-          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">核心品类 / 价格偏差 / TCO</div>
-        </div>
-        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab3')">
-          <div style="font-size:32px;margin-bottom:10px;">&#128202;</div>
-          <div style="font-size:14px;font-weight:600;">价格趋势</div>
-          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">市场价 / 期货 / 锁价建议</div>
-        </div>
-        <div class="card-panel" style="cursor:pointer;text-align:center;padding:24px;" onclick="switchTab('tab7')">
-          <div style="font-size:32px;margin-bottom:10px;">&#129307;</div>
-          <div style="font-size:14px;font-weight:600;">供应源分析</div>
-          <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">绩效评估 / 风险识别</div>
-        </div>
-      </div>
-    </div>
-
-  </section><!-- END tabHome -->
 
 
   <!-- ============================================================ -->
   <!-- TAB 1: 降本分析                                              -->
   <!-- ============================================================ -->
-  <section class="module-section" id="tab1">
+  <section class="module-section active" id="tab1">
     <div class="kpi-row">
       <div class="kpi-card cyan"><div class="kpi-label">年度采购额(实际)</div><div class="kpi-value">48.67<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span><span class="kpi-target">预算:52.00亿</span></div></div>
       <div class="kpi-card gold"><div class="kpi-label">年度降本额(实际)</div><div class="kpi-value">2.84<span class="unit">亿元</span></div><div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 15.2% YoY</span><span class="kpi-target">目标:3.50亿</span></div></div>
@@ -936,8 +818,7 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
   'use strict';
 
   
-  // 启动AI助手浮层
-  bootAssistantShell();
+  
 
   /* ================================================================
      PART 0: 工具函数 & 常量
@@ -960,7 +841,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
      PART 1: Tab 切换系统 (稳定化)
      ================================================================ */
   const TAB_MAP = {
-    tabHome:  { charts: [] },
     tab1:     { charts: ['chartMonthlySavings','chartBuSavings','chartSubSavings','chartMroSavings','chartItSavings','chartLogisticsSavings','chartProcureAmount','chartSavingRatio','chartForecastAmount','chartForecastYoy','chartForecastRatio'] },
     tab2:     { charts: ['chartCoreSpend','chartPriceDeviation','chartPriceTrendCompare','chartInventorySpend','chartVMI','chartSupplierConc','chartTCOCategory','chartTCOBu','chartTCOSubsidiary','chartLongContract'] },
     tab3:     { charts: ['chartMarketPriceTrend','chartFuturesPrice','chartMacroIndicators','chartProcureVsMarket','chartInventoryLevel','chartPriceForecast','chartPurchaseScenario'] },
@@ -971,7 +851,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
   };
 
   const TAB_LABELS = {
-    tabHome: '首页驾驶舱',
     tab1: '降本分析',
     tab2: '支出分析',
     tab3: '价格趋势分析',
@@ -981,7 +860,7 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     tab7: '供应源分析'
   };
 
-  let _activeTab = 'tabHome';
+  let _activeTab = 'tab1';
   const dashboardStateBus = createDashboardStateBus({
     initialState: createInitialDashboardState({
       session: {
@@ -996,7 +875,7 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
   });
   const aiContextBridge = createContextBridge({
     stateBus: dashboardStateBus,
-    resolveModuleName: (tabId) => TAB_LABELS[tabId] || TAB_LABELS.tabHome,
+    resolveModuleName: (tabId) => TAB_LABELS[tabId] || '降本分析',
     getChartDimension: (chartId) => _dimState[chartId] || null
   });
   let assistantShell = null;
@@ -1008,7 +887,7 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     return {
       ...snapshot.ui,
       activeTab: _activeTab,
-      activeModule: TAB_LABELS[_activeTab] || TAB_LABELS.tabHome
+      activeModule: TAB_LABELS[_activeTab] || '降本分析'
     };
   }
 
@@ -1034,12 +913,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
           try { chartInstances[id].resize(); } catch(e) {}
         }
       });
-      // 也resize首页所有图表
-      if (tabId === 'tabHome') {
-        Object.keys(chartInstances).forEach(id => {
-          try { chartInstances[id].resize(); } catch(e) {}
-        });
-      }
     });
 
     // 关闭可能打开的弹窗/AI面板
@@ -1052,6 +925,9 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+
+  // 启动AI助手浮层
+  bootAssistantShell();
   /* ================================================================
      PART 2: 维度切换数据骨架 (可扩展)
      
