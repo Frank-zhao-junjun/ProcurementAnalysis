@@ -5,12 +5,6 @@
   <meta name="viewport" content="width=1920" />
   <title>采购经营分析大屏 - Procurement Intelligence Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-  <!-- 数据服务层 -->
-  <script src="./assets/js/api/client.js"></script>
-  <script src="./assets/js/services/data-service.js"></script>
-  <script src="./assets/js/components/loading.js"></script>
-  <script src="./assets/js/dashboard-init.js"></script>
-  <link rel="stylesheet" href="./styles/main.css" />
   <link rel="preconnect" href="https://fonts.googleapis.cn" crossorigin>
   <link href="https://fonts.googleapis.cn/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -288,47 +282,47 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <!-- ============================================================ -->
   <section class="module-section active" id="tabHome">
 
-    <!-- 核心KPI - 10个关键指标 (数据通过API动态加载) -->
+    <!-- 核心KPI - 10个关键指标 -->
     <div class="kpi-row">
-      <div class="kpi-card cyan kpi-annual-amount">
+      <div class="kpi-card cyan">
         <div class="kpi-label">年度采购额</div>
-        <div class="kpi-value">--<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">加载中...</span></div>
+        <div class="kpi-value">48.67<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span><span class="kpi-target">预算: 52.00亿</span></div>
       </div>
-      <div class="kpi-card gold kpi-savings">
+      <div class="kpi-card gold">
         <div class="kpi-label">年度降本额</div>
-        <div class="kpi-value">--<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
+        <div class="kpi-value">2.84<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 15.2% YoY</span><span class="kpi-target">目标: 3.50亿 | 达成率81.1%</span></div>
       </div>
-      <div class="kpi-card green kpi-savings-rate">
+      <div class="kpi-card green">
         <div class="kpi-label">降本比例</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
+        <div class="kpi-value">5.84<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +0.33pp YoY</span><span class="kpi-target">目标: 7.00%</span></div>
       </div>
-      <div class="kpi-card purple kpi-forecast">
+      <div class="kpi-card purple">
         <div class="kpi-label">全年预测降本</div>
-        <div class="kpi-value">--<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
+        <div class="kpi-value">3.26<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 同比+22.1%</span><span class="kpi-target">达成预估93.1%</span></div>
       </div>
-      <div class="kpi-card cyan kpi-execution-rate">
+      <div class="kpi-card cyan">
         <div class="kpi-label">预算执行率</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-target">加载中...</span></div>
+        <div class="kpi-value">93.6<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-target">剩余额度: 3.33亿</span></div>
       </div>
-      <div class="kpi-card green kpi-material-cost">
+      <div class="kpi-card green">
         <div class="kpi-label">材料成本率</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
+        <div class="kpi-value">68.4<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; -0.8pp YoY</span><span class="kpi-target">持续优化中</span></div>
       </div>
-      <div class="kpi-card gold kpi-supplier-performance">
+      <div class="kpi-card gold">
         <div class="kpi-label">供应商平均绩效</div>
-        <div class="kpi-value">--<span class="unit">分</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
+        <div class="kpi-value">82.6<span class="unit">分</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +2.3分 YoY</span><span class="kpi-target">目标基准: 80分</span></div>
       </div>
-      <div class="kpi-card purple kpi-delivery-rate">
+      <div class="kpi-card purple">
         <div class="kpi-label">交付及时率</div>
-        <div class="kpi-value">--<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
+        <div class="kpi-value">94.2<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +1.8pp YoY</span><span class="kpi-target">目标: 95%</span></div>
       </div>
     </div>
 
@@ -346,11 +340,42 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
           <span class="alert-count-item alert-count-ok">&#9989; 正常 <strong>2</strong></span>
         </div>
       </div>
-      <div class="alert-grid p0-alerts-container">
-        <!-- 预警内容将由JavaScript动态加载 -->
-        <div class="alert-loading" style="text-align:center;padding:30px;color:var(--text-muted)">
-          <div class="loading-spinner" style="display:inline-block;width:40px;height:40px;border:3px solid rgba(56,189,248,.2);border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite"></div>
-          <p style="margin-top:12px;font-size:13px">加载预警数据...</p>
+      <div class="alert-grid">
+        <!-- AL_PRICE_001: HIGH -->
+        <div class="alert-item high" onclick="switchTab('tab2')">
+          <div class="alert-item-code">AL_PRICE_001</div>
+          <div class="alert-item-title text-red">&#128200; 钢材采购价偏离市场均价 <span class="badge badge-high">高危</span></div>
+          <div class="alert-item-desc">当前偏离度 <strong>+5.8%</strong>，超过高危阈值(8%未达但接近)。热轧卷板我司均价3880元/吨 vs 市场公允价3667元/吨。月度潜在超支约<strong class="text-red"> 420万元</strong>。</div>
+        </div>
+        <!-- AL_INVENTORY_003: HIGH -->
+        <div class="alert-item high" onclick="switchTab('tab4')">
+          <div class="alert-item-code">AL_INVENTORY_003</div>
+          <div class="alert-item-title text-red">&#128230; 塑料粒子缺货风险 <span class="badge badge-high">高危</span></div>
+          <div class="alert-item-desc">可支撑天数仅<strong>12.8天</strong>，低于安全线(10天以上为安全，但接近警戒线15天)。PP拉丝库存4,260吨，日均消耗332吨/天。建议72小时内启动紧急补货。</div>
+        </div>
+        <!-- AL_SPEND_002: MID -->
+        <div class="alert-item mid" onclick="switchTab('tab2')">
+          <div class="alert-item-code">AL_SPEND_002</div>
+          <div class="alert-item-title text-gold">&#128176; 事业部3支出突增 <span class="badge badge-mid">中危</span></div>
+          <div class="alert-item-desc">12月支出环比增长<strong>+18.5%</strong>（接近20%阈值），同比+28.4%（已超25%阈值）。主要因电池包原材料备货及新产线爬坡导致。</div>
+        </div>
+        <!-- AL_SUPPLIER_002: MID -->
+        <div class="alert-item mid" onclick="switchTab('tab7')">
+          <div class="alert-item-code">AL_SUPPLIER_002</div>
+          <div class="alert-item-title text-gold">&#128172; 部分供应商交付及时率下滑 <span class="badge badge-mid">中危</span></div>
+          <div class="alert-item-desc"><strong>利安德巴塞尔</strong>近3月交付及时率降至87.2%（低于95%中危线），累计延迟交货6批次，影响产线排产。</div>
+        </div>
+        <!-- AL_SPEND_001: OK -->
+        <div class="alert-item ok" onclick="switchTab('tab1')">
+          <div class="alert-item-code">AL_SPEND_001</div>
+          <div class="alert-item-title text-green">&#128202; 预算执行率正常 <span class="badge badge-ok">正常</span></div>
+          <div class="alert-item-desc">集团整体预算执行率93.6%，偏离目标(-6.4pp)在可控范围内(<10pp)。剩余额度3.33亿可支撑Q1需求。</div>
+        </div>
+        <!-- AL_SUPPLIER_003: OK -->
+        <div class="alert-item ok" onclick="switchTab('tab7')">
+          <div class="alert-item-code">AL_SUPPLIER_003</div>
+          <div class="alert-item-title text-green">&#127981; 独家供应风险可控 <span class="badge badge-ok">正常</span></div>
+          <div class="alert-item-desc">独家供应物料共34个SKU，其中高危8个（年采购额>500万）。已制定二供开发计划，Q1预计完成3个品类的供应商引入。</div>
         </div>
       </div>
     </div>
@@ -360,20 +385,66 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
       <!-- 事业部降本排名 -->
       <div class="ranking-card">
         <div class="ranking-card-title"><span style="color:var(--accent-cyan);">&#127942;</span> 事业部降本排名 (按达成率)</div>
-        <ul class="ranking-list bu-ranking">
-          <!-- 排名数据将由JavaScript动态加载 -->
-          <li class="ranking-item" style="justify-content:center;padding:20px;color:var(--text-muted)">
-            <span>加载排名数据...</span>
+        <ul class="ranking-list">
+          <li class="ranking-item">
+            <span class="ranking-rank rank-1">1</span>
+            <span class="ranking-name">事业部1</span>
+            <span class="ranking-value text-cyan">8,620万</span>
+            <span class="ranking-change change-up">107.8% &#9650;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-2">2</span>
+            <span class="ranking-name">事业部2</span>
+            <span class="ranking-value text-cyan">7,240万</span>
+            <span class="ranking-change change-mid">96.5% &#8960;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-3">3</span>
+            <span class="ranking-name">事业部3</span>
+            <span class="ranking-value text-cyan">6,830万</span>
+            <span class="ranking-change change-down">94.9% &#9660;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-n">4</span>
+            <span class="ranking-name">事业部4</span>
+            <span class="ranking-value text-cyan">5,710万</span>
+            <span class="ranking-change change-down">87.8% &#9660;</span>
           </li>
         </ul>
       </div>
       <!-- 子公司排名 -->
       <div class="ranking-card">
         <div class="ranking-card-title"><span style="color:var(--accent-purple);">&#127970;</span> 子公司降本排名 (按达成率)</div>
-        <ul class="ranking-list subsidiary-ranking">
-          <!-- 排名数据将由JavaScript动态加载 -->
-          <li class="ranking-item" style="justify-content:center;padding:20px;color:var(--text-muted)">
-            <span>加载排名数据...</span>
+        <ul class="ranking-list">
+          <li class="ranking-item">
+            <span class="ranking-rank rank-1">1</span>
+            <span class="ranking-name">子公司1</span>
+            <span class="ranking-value text-purple">7,640万</span>
+            <span class="ranking-change change-up">95.5% &#9650;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-2">2</span>
+            <span class="ranking-name">子公司2</span>
+            <span class="ranking-value text-purple">6,320万</span>
+            <span class="ranking-change change-mid">92.9% &#8960;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-3">3</span>
+            <span class="ranking-name">子公司3</span>
+            <span class="ranking-value text-purple">5,860万</span>
+            <span class="ranking-change change-mid">97.7% &#9650;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-n">4</span>
+            <span class="ranking-name">子公司4</span>
+            <span class="ranking-value text-purple">4,920万</span>
+            <span class="ranking-change change-down">94.6% &#9660;</span>
+          </li>
+          <li class="ranking-item">
+            <span class="ranking-rank rank-n">5</span>
+            <span class="ranking-name">子公司5</span>
+            <span class="ranking-value text-purple">3,720万</span>
+            <span class="ranking-change change-down">93.0% &#9660;</span>
           </li>
         </ul>
       </div>
@@ -620,11 +691,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
           </table>
         </div>
       </div>
-    </div>
-
-    <div class="section-block mt-16">
-      <div class="section-title">What-if 模拟引擎 <span class="subtitle">采购比例调整场景 MVP</span></div>
-      <div class="card-panel whatif-panel-shell" id="whatifPanelRoot"></div>
     </div>
   </section><!-- END tab2 -->
 
@@ -970,13 +1036,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 
 
   <!-- ==================== JAVASCRIPT ==================== -->
-  <script type="module">
-import { createDashboardStateBus, createInitialDashboardState } from './assets/js/ai/state-bus.js';
-import { createContextBridge } from './assets/js/ai/context-bridge.js';
-import { bootAssistantShell, createProxyMessageSender } from './assets/js/ai/assistant-shell.js';
-import { createAiPrivacyGate } from './assets/js/ai/privacy-gate.js';
-import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
-
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script>
 (function() {
   'use strict';
 
@@ -1011,47 +1073,7 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     tab7:     { charts: ['chartSupplierRadar','chartSpendPerfMatch'] }
   };
 
-  const TAB_LABELS = {
-    tabHome: '首页驾驶舱',
-    tab1: '降本分析',
-    tab2: '支出分析',
-    tab3: '价格趋势分析',
-    tab4: '需求趋势分析',
-    tab5: '材料成本率',
-    tab6: '其他降本机会',
-    tab7: '供应源分析'
-  };
-
   let _activeTab = 'tabHome';
-  const dashboardStateBus = createDashboardStateBus({
-    initialState: createInitialDashboardState({
-      session: {
-        userRole: 'procurement_manager',
-        dateRange: '2026-W15'
-      },
-      ui: {
-        activeTab: _activeTab,
-        activeModule: TAB_LABELS[_activeTab]
-      }
-    })
-  });
-  const aiContextBridge = createContextBridge({
-    stateBus: dashboardStateBus,
-    resolveModuleName: (tabId) => TAB_LABELS[tabId] || TAB_LABELS.tabHome,
-    getChartDimension: (chartId) => _dimState[chartId] || null
-  });
-  let assistantShell = null;
-  let whatIfPanel = null;
-
-  function getWhatIfBaselineSnapshot() {
-    const snapshot = dashboardStateBus.getSnapshot();
-
-    return {
-      ...snapshot.ui,
-      activeTab: _activeTab,
-      activeModule: TAB_LABELS[_activeTab] || TAB_LABELS.tabHome
-    };
-  }
 
   function switchTab(tabId) {
     // 更新按钮状态
@@ -1065,7 +1087,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     if (!target) return;
     target.classList.add('active');
     _activeTab = tabId;
-    aiContextBridge.syncTab(tabId);
 
     // 延迟resize当前tab的图表(等待DOM渲染完成)
     requestAnimationFrame(() => {
@@ -1086,8 +1107,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     // 关闭可能打开的弹窗/AI面板
     closeModal();
   }
-
-  window.switchTab = switchTab;
 
   $$('#mainTabs .tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -1110,13 +1129,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     '子公司1': '子公司1', '子公司2': '子公司2', '子公司3': '子公司3', '子公司4': '子公司4', '子公司5': '子公司5',
     '按品类': '按品类', '热轧卷板': '热轧卷板', 'PP拉丝': 'PP拉丝', 'MDI': 'MDI'
   };
-
-  // ---- 颜色体系 ----
-  const COLORS = {
-    cyan: '#38bdf8', gold: '#f59e0b', green: '#10b981', red: '#ef4444',
-    purple: '#a78bfa', blue: '#3b82f6', orange: '#f97316', teal: '#14b8a6', pink: '#ec4899', indigo: '#6366f1'
-  };
-  const COLOR_ARRAY = [COLORS.cyan, COLORS.gold, COLORS.green, COLORS.purple, COLORS.red, COLORS.blue, COLORS.orange, COLORS.teal];
 
   // ---- 核心维度数据集 ----
   // 数据常量 (提前声明，供DIM_DATA引用，避免TDZ错误)
@@ -1289,7 +1301,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
       return;
     }
     _dimState[chartId] = dimName;
-    aiContextBridge.syncDimension({ chartId, dimName });
 
     const chart = chartInstances[chartId];
     if (!chart) return;
@@ -1462,52 +1473,12 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     return chart;
   }
 
-  function findTabByChartId(chartId) {
-    return Object.keys(TAB_MAP).find((tabId) => TAB_MAP[tabId].charts.includes(chartId)) || null;
-  }
-
-  function focusChartFromAi(chartId) {
-    const targetTab = findTabByChartId(chartId);
-    if (targetTab) {
-      switchTab(targetTab);
-    }
-
-    const chart = chartInstances[chartId];
-    if (!chart) {
-      return false;
-    }
-
-    aiContextBridge.syncChartSelection({ chartId, params: { name: chartId } });
-    requestAnimationFrame(() => {
-      try { chart.resize(); } catch (error) {}
-      try { chart.dispatchAction({ type: 'highlight', seriesIndex: 0, dataIndex: 0 }); } catch (error) {}
-    });
-    return true;
-  }
-
-  function bindFilterEvents() {
-    $$('[data-filter-key]').forEach((element) => {
-      const syncFilter = () => {
-        const currentFilters = dashboardStateBus.getSnapshot().ui.activeFilters;
-        const nextValue = element.value || element.dataset.filterValue || null;
-        aiContextBridge.syncFilters({
-          ...currentFilters,
-          [element.dataset.filterKey]: nextValue
-        });
-      };
-
-      element.addEventListener('change', syncFilter);
-      element.addEventListener('click', syncFilter);
-    });
-  }
-
-  window.PIDashboardAI = {
-    ...(window.PIDashboardAI || {}),
-    stateBus: dashboardStateBus,
-    contextBridge: aiContextBridge,
-    navigateToTab: switchTab,
-    focusChart: focusChartFromAi
+  // ---- 颜色体系 ----
+  const COLORS = {
+    cyan: '#38bdf8', gold: '#f59e0b', green: '#10b981', red: '#ef4444',
+    purple: '#a78bfa', blue: '#3b82f6', orange: '#f97316', teal: '#14b8a6', pink: '#ec4899', indigo: '#6366f1'
   };
+  const COLOR_ARRAY = [COLORS.cyan, COLORS.gold, COLORS.green, COLORS.purple, COLORS.red, COLORS.blue, COLORS.orange, COLORS.teal];
 
   // ---- 通用配置 ----
   const COMMON = {
@@ -1797,6 +1768,157 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
 
 
   /* ================================================================
+     PART 5: AI 助手浮层
+     ================================================================ */
+  const _aiState = { open: false, messages: [] };
+
+  // 创建AI助手DOM (动态注入)
+  function createAIAssistant() {
+    const wrapper = document.createElement('div');
+    wrapper.id = 'ai-assistant-wrapper';
+    wrapper.innerHTML = `
+      <div id="ai-toggle-btn" title="AI智能助手">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12L8 16"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span class="ai-badge">AI</span>
+      </div>
+      <div id="ai-panel" style="display:none;">
+        <div id="ai-panel-header">
+          <div><span class="ai-icon">&#129302;</span> 采购智能助手</div>
+          <button id="ai-close-btn" title="关闭">&times;</button>
+        </div>
+        <div id="ai-messages"></div>
+        <div id="ai-input-row">
+          <input type="text" id="ai-input" placeholder="输入问题，如：钢材价格趋势如何？降本缺口怎么补？" autocomplete="off" />
+          <button id="ai-send-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div id="ai-suggestions">
+          <span class="ai-tag" data-q="本月降本达成率是多少？">降本达成</span>
+          <span class="ai-tag" data-q="哪些品类有价格偏离风险？">价格风险</span>
+          <span class="ai-tag" data-q="供应商交付及时率如何？">交付分析</span>
+          <span class="ai-tag" data-q="库存缺货风险有哪些？">库存预警</span>
+        </div>
+      </div>`;
+    document.body.appendChild(wrapper);
+
+    // 样式
+    const style = document.createElement('style');
+    style.textContent = `
+      #ai-assistant-wrapper{position:fixed;bottom:24px;right:24px;z-index:9999;font-family:'Inter',sans-serif}
+      #ai-toggle-btn{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#38bdf8,#6366f1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 20px rgba(56,189,248,.4),0 0 40px rgba(99,102,241,.15);transition:all .3s ease;position:relative}
+      #ai-toggle-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(56,189,248,.5),0 0 50px rgba(99,102,241,.2)}
+      #ai-toggle-btn svg{color:#fff}
+      .ai-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:999px;border:2px solid #0a0e1a}
+      #ai-panel{position:absolute;bottom:68px;right:0;width:380px;height:520px;background:rgba(17,24,39,.97);border:1px solid rgba(56,189,248,.25);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 60px rgba(56,189,248,.08);backdrop-filter:blur(20px)}
+      #ai-panel.show{animation:aiSlideUp .3s ease}
+      @keyframes aiSlideUp{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+      #ai-panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(56,189,248,.12);flex-shrink:0}
+      #ai-panel-header div{font-size:14px;font-weight:600;color:#e2e8f0;display:flex;align-items:center;gap:8px}
+      .ai-icon{font-size:18px}
+      #ai-close-btn{background:none;border:none;color:#94a3b8;font-size:22px;cursor:pointer;padding:0 4px;line-height:1;transition:color .2s}
+      #ai-close-btn:hover{color:#ef4444}
+      #ai-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin}
+      #ai-messages::-webkit-scrollbar{width:4px}
+      #ai-messages::-webkit-scrollbar-thumb{background:rgba(56,189,248,.2);border-radius:4px}
+      .ai-msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;word-break:break-word}
+      .ai-msg-user{align-self:flex-end;background:linear-gradient(135deg,#38bdf8,#6366f1);color:#fff;border-bottom-right-radius:4px}
+      .ai-msg-bot{align-self:flex-start;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.15);color:#cbd5e1;border-bottom-left-radius:4px}
+      .ai-msg-bot strong{color:#38bdf8}
+      .ai-typing{align-self:flex-start;padding:8px 14px;background:rgba(56,189,248,.06);border-radius:12px;font-size:12px;color:#94a3b8;display:flex;gap:4px}
+      .ai-typing span{width:6px;height:6px;background:#38bdf8;border-radius:50%;animation:aiBounce 1.2s infinite}
+      .ai-typing span:nth-child(2){animation-delay:.2s}.ai-typing span:nth-child(3){animation-delay:.4s}
+      @keyframes aiBounce{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+      #ai-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid rgba(56,189,248,.12);flex-shrink:0}
+      #ai-input{flex:1;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:10px;padding:10px 14px;color:#e2e8f0;font-size:13px;outline:none;transition:border-color .2s;font-family:inherit}
+      #ai-input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+      #ai-input::placeholder{color:#64748b}
+      #ai-send-btn{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#6366f1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .2s;flex-shrink:0}
+      #ai-send-btn:hover{transform:scale(1.05);box-shadow:0 2px 12px rgba(56,189,248,.4)}
+      #ai-send-btn svg{color:#fff}
+      #ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 12px;flex-shrink:0}
+      .ai-tag{padding:5px 10px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:999px;font-size:11px;color:#94a3b8;cursor:pointer;transition:all .2s;white-space:nowrap}
+      .ai-tag:hover{background:rgba(56,189,248,.15);color:#38bdf8;border-color:rgba(56,189,248,.3)}
+    `;
+    document.head.appendChild(style);
+
+    // 绑定事件
+    $('#ai-toggle-btn').addEventListener('click', toggleAIPanel);
+    $('#ai-close-btn').addEventListener('click', () => setAIPanel(false));
+    $('#ai-send-btn').addEventListener('click', sendAIMessage);
+    $('#ai-input').addEventListener('keydown', e => { if(e.key==='Enter') sendAIMessage(); });
+    $$('#ai-suggestions .ai-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        $('#ai-input').value = tag.dataset.q;
+        sendAIMessage();
+      });
+    });
+  }
+
+  function toggleAIPanel() { setAIPanel(!_aiState.open); }
+  function setAIPanel(open) {
+    _aiState.open = open;
+    const panel = $('#ai-panel');
+    if (open) {
+      panel.style.display = 'flex';
+      requestAnimationFrame(() => panel.classList.add('show'));
+      $('#ai-input').focus();
+      // 首次打开显示欢迎语
+      if (_aiState.messages.length === 0) {
+        addAIMessage('bot', '你好！我是采购智能助手。你可以问我关于<strong>降本分析</strong>、<strong>价格趋势</strong>、<strong>库存预警</strong>、<strong>供应商绩效</strong>等方面的问题。试试点击下方的快捷提问？');
+      }
+    } else {
+      panel.classList.remove('show');
+      setTimeout(() => { panel.style.display = 'none'; }, 200);
+    }
+  }
+
+  function addAIMessage(type, html) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `ai-msg ai-msg-${type}`;
+    msgDiv.innerHTML = html;
+    const container = $('#ai-messages');
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+    _aiState.messages.push({type,html});
+  }
+
+  function sendAIMessage() {
+    const input = $('#ai-input');
+    const q = input.value.trim();
+    if (!q) return;
+    addAIMessage('user', q);
+    input.value = '';
+
+    // 显示typing动画
+    const typing = document.createElement('div');
+    typing.className = 'ai-typing';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    $('#ai-messages').appendChild(typing);
+    $('#ai-messages').scrollTop = $('#ai-messages').scrollHeight;
+
+    // 模拟AI回复 (可替换为真实LLM API调用)
+    setTimeout(() => {
+      typing.remove();
+      const reply = getAIReply(q);
+      addAIMessage('bot', reply);
+    }, 800 + Math.random() * 700);
+  }
+
+  // AI 回复规则引擎 (演示用，后续对接LLM API)
+  function getAIReply(q) {
+    const ql = q.toLowerCase();
+    if (ql.includes('降本') || ql.includes('达成')) return `根据当前数据：<br/><br/>📊 <strong>年度降本额</strong>: 2.84亿元 (目标3.50亿)<br/>📈 <strong>达成率</strong>: 81.1% (+15.2% YoY)<br/>🔮 <strong>全年预测</strong>: 3.26亿 (93.1%)<br/><br/>💡 <strong>建议</strong>: 塑料粒子缺口1,200万最大，建议推进进口替代谈判。`;
+    if (ql.includes('价格') || ql.includes('偏离') || ql.includes('偏差')) return `⚠️ 当前价格风险：<br/><br/>🔴 <strong>钢材</strong>: 偏离+5.8%（高危阈值8%）<br/>🟠 <strong>塑料粒子</strong>: 偏离+3.0%（中危阈值5%）<br/>✅ <strong>MDI</strong>: 偏离-1.8%（正常）<br/><br/>💡 建议：钢材立即启动与宝武/鞍钢的价格复议。`;
+    if (ql.includes('交付') || ql.includes('供应商') || ql.includes('绩效')) return `📋 供应商绩效概览：<br/><br/>✅ <strong>平均得分</strong>: 82.6分 (+2.3 YoY)<br/>⚠️ <strong>交付及时率</strong>: 94.2% (目标95%，差0.8pp)<br/>🔴 <strong>利安德巴塞尔</strong>: 87.2% (需约谈)<br/><br/>💡 建议本周安排与利ander巴塞尔的改进会议。`;
+    if (ql.includes('库存') || ql.includes('缺货') || ql.includes('预警')) return `📦 库存健康度预警：<br/><br/>🔴 <strong>塑料粒子</strong>: 仅12.8天 (警戒线15天)<br/>🟠 <strong>某芯片</strong>: 14.2天<br/>🟠 <strong>进口轴承</strong>: 18.6天<br/><br/>💡 建议72小时内启动塑料粒子紧急补货。`;
+    if (ql.includes('预算') || ql.includes('支出')) return `💰 支出与预算：<br/><br/>📊 <strong>总支出</strong>: 48.67亿元<br/>📈 <strong>预算执行率</strong>: 93.6% (正常)<br/>⚠️ <strong>新能源事业部</strong>: 支出突增+28.4% YoY<br/><br/>💡 建议核实新能源是否为新项目一次性投入。`;
+    return `收到你的问题："${q}"<br/><br/>我理解你想了解这个方面。目前我是<strong>演示模式</strong>，已内置常见问题的回复逻辑。<br/><br/>你可以尝试问我：<br/>• "本月降本达成率是多少？"<br/>• "哪些品类有价格偏离风险？"<br/>• "供应商交付情况如何？"<br/>• "库存有哪些缺货风险？"`;
+  }
+
+  /* ================================================================
      PART 6: 下钻弹窗组件 (预埋)
      
      用法:
@@ -1900,7 +2022,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
       card.addEventListener('click', () => {
         const label = card.querySelector('.kpi-label')?.textContent || '指标';
         const value = card.querySelector('.kpi-value')?.textContent || '';
-        aiContextBridge.syncKpiSelection({ label, value });
         openDrillDown({
           title: `${label} - 明细下钻`,
           icon: '💰',
@@ -1935,7 +2056,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
       try {
         chartInstances[id].on('click', params => {
           const name = params.name || params.seriesName || id;
-          aiContextBridge.syncChartSelection({ chartId: id, params });
           openDrillDown({
             title: `${name} - 数据下钻`,
             icon: '📈',
@@ -1974,55 +2094,16 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
 
   // DOM Ready后初始化
   function init() {
-    aiContextBridge.syncTab(_activeTab);
-    bindFilterEvents();
-    const privacyGate = createAiPrivacyGate();
-    const sendProxyMessage = createProxyMessageSender({
-      endpoint: window.__AI_PROXY_ENDPOINT__ || 'http://localhost:3000/api/ai-proxy/chat'
-    });
-    assistantShell = bootAssistantShell({
-      stateBus: dashboardStateBus,
-      privacyGate,
-      onSendMessage: sendProxyMessage
-    });
-    const whatIfRoot = document.getElementById('whatifPanelRoot');
-    if (whatIfRoot) {
-      whatIfPanel = bootWhatIfPanel({
-        mountNode: whatIfRoot,
-        baselineSnapshotFactory: getWhatIfBaselineSnapshot
-      });
-    }
+    createAIAssistant();
     createModal();
     bindDrillDownEvents();
 
-    if (whatIfPanel) {
-      window.PIDashboardAI = {
-        ...window.PIDashboardAI,
-        whatIfPanel
-      };
-    }
-
-    console.log('[PI Dashboard] ✅ 核心组件初始化完成');
+    console.log('[PI Dashboard] ✅ 初始化完成');
     console.log(`[PI Dashboard] 📊 图表总数: ${Object.keys(chartInstances).length}`);
     console.log(`[PI Dashboard] 📊 图表列表: ${Object.keys(chartInstances).join(', ')}`);
     console.log(`[PI Dashboard] 🔀 维度切换覆盖: ${Object.keys(DIM_DATA).length} 个图表`);
     console.log(`[PI Dashboard] 💬 AI助手: 已就绪`);
     console.log(`[PI Dashboard] 🔍 下钻弹窗: 已预埋`);
-    
-    // 启动数据加载 (从API获取实时数据)
-    console.log('[PI Dashboard] 🔄 开始加载Dashboard数据...');
-    if (window.DashboardInit && typeof window.DashboardInit.init === 'function') {
-      // 延迟执行以确保DOM完全渲染
-      setTimeout(() => {
-        window.DashboardInit.init().then(() => {
-          console.log('[PI Dashboard] ✅ Dashboard数据加载完成');
-        }).catch(err => {
-          console.warn('[PI Dashboard] ⚠️ 数据加载失败，使用默认数据:', err);
-        });
-      }, 500);
-    } else {
-      console.warn('[PI Dashboard] ⚠️ DashboardInit未加载，使用默认数据');
-    }
   }
 
   if (document.readyState === 'loading') {
