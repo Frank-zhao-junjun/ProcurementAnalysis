@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=1920" />
   <title>采购经营分析大屏 - Procurement Intelligence Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <!-- 数据服务层 -->
+  <script src="./assets/js/api/client.js"></script>
+  <script src="./assets/js/services/data-service.js"></script>
+  <script src="./assets/js/components/loading.js"></script>
+  <script src="./assets/js/dashboard-init.js"></script>
   <link rel="stylesheet" href="./styles/main.css" />
   <link rel="preconnect" href="https://fonts.googleapis.cn" crossorigin>
   <link href="https://fonts.googleapis.cn/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -283,47 +288,47 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <!-- ============================================================ -->
   <section class="module-section active" id="tabHome">
 
-    <!-- 核心KPI - 10个关键指标 -->
+    <!-- 核心KPI - 10个关键指标 (数据通过API动态加载) -->
     <div class="kpi-row">
-      <div class="kpi-card cyan">
+      <div class="kpi-card cyan kpi-annual-amount">
         <div class="kpi-label">年度采购额</div>
-        <div class="kpi-value">48.67<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 8.3% YoY</span><span class="kpi-target">预算: 52.00亿</span></div>
+        <div class="kpi-value">--<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend trend-up">加载中...</span></div>
       </div>
-      <div class="kpi-card gold">
+      <div class="kpi-card gold kpi-savings">
         <div class="kpi-label">年度降本额</div>
-        <div class="kpi-value">2.84<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 15.2% YoY</span><span class="kpi-target">目标: 3.50亿 | 达成率81.1%</span></div>
+        <div class="kpi-value">--<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
       </div>
-      <div class="kpi-card green">
+      <div class="kpi-card green kpi-savings-rate">
         <div class="kpi-label">降本比例</div>
-        <div class="kpi-value">5.84<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +0.33pp YoY</span><span class="kpi-target">目标: 7.00%</span></div>
+        <div class="kpi-value">--<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
       </div>
-      <div class="kpi-card purple">
+      <div class="kpi-card purple kpi-forecast">
         <div class="kpi-label">全年预测降本</div>
-        <div class="kpi-value">3.26<span class="unit">亿元</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; 同比+22.1%</span><span class="kpi-target">达成预估93.1%</span></div>
+        <div class="kpi-value">--<span class="unit">亿元</span></div>
+        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
       </div>
-      <div class="kpi-card cyan">
+      <div class="kpi-card cyan kpi-execution-rate">
         <div class="kpi-label">预算执行率</div>
-        <div class="kpi-value">93.6<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-target">剩余额度: 3.33亿</span></div>
+        <div class="kpi-value">--<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-target">加载中...</span></div>
       </div>
-      <div class="kpi-card green">
+      <div class="kpi-card green kpi-material-cost">
         <div class="kpi-label">材料成本率</div>
-        <div class="kpi-value">68.4<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-down">&#9660; -0.8pp YoY</span><span class="kpi-target">持续优化中</span></div>
+        <div class="kpi-value">--<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
       </div>
-      <div class="kpi-card gold">
+      <div class="kpi-card gold kpi-supplier-performance">
         <div class="kpi-label">供应商平均绩效</div>
-        <div class="kpi-value">82.6<span class="unit">分</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +2.3分 YoY</span><span class="kpi-target">目标基准: 80分</span></div>
+        <div class="kpi-value">--<span class="unit">分</span></div>
+        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
       </div>
-      <div class="kpi-card purple">
+      <div class="kpi-card purple kpi-delivery-rate">
         <div class="kpi-label">交付及时率</div>
-        <div class="kpi-value">94.2<span class="unit">%</span></div>
-        <div class="kpi-sub"><span class="kpi-trend trend-up">&#9650; +1.8pp YoY</span><span class="kpi-target">目标: 95%</span></div>
+        <div class="kpi-value">--<span class="unit">%</span></div>
+        <div class="kpi-sub"><span class="kpi-trend">加载中...</span></div>
       </div>
     </div>
 
@@ -341,42 +346,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
           <span class="alert-count-item alert-count-ok">&#9989; 正常 <strong>2</strong></span>
         </div>
       </div>
-      <div class="alert-grid">
-        <!-- AL_PRICE_001: HIGH -->
-        <div class="alert-item high" onclick="switchTab('tab2')">
-          <div class="alert-item-code">AL_PRICE_001</div>
-          <div class="alert-item-title text-red">&#128200; 钢材采购价偏离市场均价 <span class="badge badge-high">高危</span></div>
-          <div class="alert-item-desc">当前偏离度 <strong>+5.8%</strong>，超过高危阈值(8%未达但接近)。热轧卷板我司均价3880元/吨 vs 市场公允价3667元/吨。月度潜在超支约<strong class="text-red"> 420万元</strong>。</div>
-        </div>
-        <!-- AL_INVENTORY_003: HIGH -->
-        <div class="alert-item high" onclick="switchTab('tab4')">
-          <div class="alert-item-code">AL_INVENTORY_003</div>
-          <div class="alert-item-title text-red">&#128230; 塑料粒子缺货风险 <span class="badge badge-high">高危</span></div>
-          <div class="alert-item-desc">可支撑天数仅<strong>12.8天</strong>，低于安全线(10天以上为安全，但接近警戒线15天)。PP拉丝库存4,260吨，日均消耗332吨/天。建议72小时内启动紧急补货。</div>
-        </div>
-        <!-- AL_SPEND_002: MID -->
-        <div class="alert-item mid" onclick="switchTab('tab2')">
-          <div class="alert-item-code">AL_SPEND_002</div>
-          <div class="alert-item-title text-gold">&#128176; 事业部3支出突增 <span class="badge badge-mid">中危</span></div>
-          <div class="alert-item-desc">12月支出环比增长<strong>+18.5%</strong>（接近20%阈值），同比+28.4%（已超25%阈值）。主要因电池包原材料备货及新产线爬坡导致。</div>
-        </div>
-        <!-- AL_SUPPLIER_002: MID -->
-        <div class="alert-item mid" onclick="switchTab('tab7')">
-          <div class="alert-item-code">AL_SUPPLIER_002</div>
-          <div class="alert-item-title text-gold">&#128172; 部分供应商交付及时率下滑 <span class="badge badge-mid">中危</span></div>
-          <div class="alert-item-desc"><strong>利安德巴塞尔</strong>近3月交付及时率降至87.2%（低于95%中危线），累计延迟交货6批次，影响产线排产。</div>
-        </div>
-        <!-- AL_SPEND_001: OK -->
-        <div class="alert-item ok" onclick="switchTab('tab1')">
-          <div class="alert-item-code">AL_SPEND_001</div>
-          <div class="alert-item-title text-green">&#128202; 预算执行率正常 <span class="badge badge-ok">正常</span></div>
-          <div class="alert-item-desc">集团整体预算执行率93.6%，偏离目标(-6.4pp)在可控范围内(<10pp)。剩余额度3.33亿可支撑Q1需求。</div>
-        </div>
-        <!-- AL_SUPPLIER_003: OK -->
-        <div class="alert-item ok" onclick="switchTab('tab7')">
-          <div class="alert-item-code">AL_SUPPLIER_003</div>
-          <div class="alert-item-title text-green">&#127981; 独家供应风险可控 <span class="badge badge-ok">正常</span></div>
-          <div class="alert-item-desc">独家供应物料共34个SKU，其中高危8个（年采购额>500万）。已制定二供开发计划，Q1预计完成3个品类的供应商引入。</div>
+      <div class="alert-grid p0-alerts-container">
+        <!-- 预警内容将由JavaScript动态加载 -->
+        <div class="alert-loading" style="text-align:center;padding:30px;color:var(--text-muted)">
+          <div class="loading-spinner" style="display:inline-block;width:40px;height:40px;border:3px solid rgba(56,189,248,.2);border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite"></div>
+          <p style="margin-top:12px;font-size:13px">加载预警数据...</p>
         </div>
       </div>
     </div>
@@ -386,66 +360,20 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
       <!-- 事业部降本排名 -->
       <div class="ranking-card">
         <div class="ranking-card-title"><span style="color:var(--accent-cyan);">&#127942;</span> 事业部降本排名 (按达成率)</div>
-        <ul class="ranking-list">
-          <li class="ranking-item">
-            <span class="ranking-rank rank-1">1</span>
-            <span class="ranking-name">事业部1</span>
-            <span class="ranking-value text-cyan">8,620万</span>
-            <span class="ranking-change change-up">107.8% &#9650;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-2">2</span>
-            <span class="ranking-name">事业部2</span>
-            <span class="ranking-value text-cyan">7,240万</span>
-            <span class="ranking-change change-mid">96.5% &#8960;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-3">3</span>
-            <span class="ranking-name">事业部3</span>
-            <span class="ranking-value text-cyan">6,830万</span>
-            <span class="ranking-change change-down">94.9% &#9660;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-n">4</span>
-            <span class="ranking-name">事业部4</span>
-            <span class="ranking-value text-cyan">5,710万</span>
-            <span class="ranking-change change-down">87.8% &#9660;</span>
+        <ul class="ranking-list bu-ranking">
+          <!-- 排名数据将由JavaScript动态加载 -->
+          <li class="ranking-item" style="justify-content:center;padding:20px;color:var(--text-muted)">
+            <span>加载排名数据...</span>
           </li>
         </ul>
       </div>
       <!-- 子公司排名 -->
       <div class="ranking-card">
         <div class="ranking-card-title"><span style="color:var(--accent-purple);">&#127970;</span> 子公司降本排名 (按达成率)</div>
-        <ul class="ranking-list">
-          <li class="ranking-item">
-            <span class="ranking-rank rank-1">1</span>
-            <span class="ranking-name">子公司1</span>
-            <span class="ranking-value text-purple">7,640万</span>
-            <span class="ranking-change change-up">95.5% &#9650;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-2">2</span>
-            <span class="ranking-name">子公司2</span>
-            <span class="ranking-value text-purple">6,320万</span>
-            <span class="ranking-change change-mid">92.9% &#8960;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-3">3</span>
-            <span class="ranking-name">子公司3</span>
-            <span class="ranking-value text-purple">5,860万</span>
-            <span class="ranking-change change-mid">97.7% &#9650;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-n">4</span>
-            <span class="ranking-name">子公司4</span>
-            <span class="ranking-value text-purple">4,920万</span>
-            <span class="ranking-change change-down">94.6% &#9660;</span>
-          </li>
-          <li class="ranking-item">
-            <span class="ranking-rank rank-n">5</span>
-            <span class="ranking-name">子公司5</span>
-            <span class="ranking-value text-purple">3,720万</span>
-            <span class="ranking-change change-down">93.0% &#9660;</span>
+        <ul class="ranking-list subsidiary-ranking">
+          <!-- 排名数据将由JavaScript动态加载 -->
+          <li class="ranking-item" style="justify-content:center;padding:20px;color:var(--text-muted)">
+            <span>加载排名数据...</span>
           </li>
         </ul>
       </div>
@@ -2074,12 +2002,27 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
       };
     }
 
-    console.log('[PI Dashboard] ✅ 初始化完成');
+    console.log('[PI Dashboard] ✅ 核心组件初始化完成');
     console.log(`[PI Dashboard] 📊 图表总数: ${Object.keys(chartInstances).length}`);
     console.log(`[PI Dashboard] 📊 图表列表: ${Object.keys(chartInstances).join(', ')}`);
     console.log(`[PI Dashboard] 🔀 维度切换覆盖: ${Object.keys(DIM_DATA).length} 个图表`);
     console.log(`[PI Dashboard] 💬 AI助手: 已就绪`);
     console.log(`[PI Dashboard] 🔍 下钻弹窗: 已预埋`);
+    
+    // 启动数据加载 (从API获取实时数据)
+    console.log('[PI Dashboard] 🔄 开始加载Dashboard数据...');
+    if (window.DashboardInit && typeof window.DashboardInit.init === 'function') {
+      // 延迟执行以确保DOM完全渲染
+      setTimeout(() => {
+        window.DashboardInit.init().then(() => {
+          console.log('[PI Dashboard] ✅ Dashboard数据加载完成');
+        }).catch(err => {
+          console.warn('[PI Dashboard] ⚠️ 数据加载失败，使用默认数据:', err);
+        });
+      }, 500);
+    } else {
+      console.warn('[PI Dashboard] ⚠️ DashboardInit未加载，使用默认数据');
+    }
   }
 
   if (document.readyState === 'loading') {

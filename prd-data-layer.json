@@ -1,0 +1,175 @@
+{
+  "projectName": "采购大屏 - 数据层建设",
+  "branchName": "feature/data-layer",
+  "version": "1.0.0",
+  "description": "构建模拟数据生成、指标计算引擎、数据库联动方案，支持无法接入真实ERP/ARIBA系统的Demo环境",
+  "userStories": [
+    {
+      "id": "US-DATA-001",
+      "title": "设计数据模型和Schema",
+      "description": "设计采购分析所需的完整数据模型，包括事实表（采购订单、库存、价格）和维度表（供应商、物料、事业部、时间）",
+      "acceptanceCriteria": [
+        "docs/data-schema.md 文档存在，包含ER图",
+        "定义核心实体: PurchaseOrder, Inventory, PriceHistory, Supplier, Material, BusinessUnit",
+        "字段定义完整，包含数据类型和业务含义",
+        "标注主外键关系和索引建议",
+        "支持SQLite作为轻量级存储"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": [],
+      "notes": "参考现有Dashboard的KPI定义，反向推导数据需求"
+    },
+    {
+      "id": "US-DATA-002",
+      "title": "搭建本地数据库环境",
+      "description": "集成SQLite作为本地数据库，初始化表结构，提供基础CRUD封装",
+      "acceptanceCriteria": [
+        "server/src/db/index.js 存在，封装数据库连接",
+        "server/src/db/schema.sql 包含完整建表语句",
+        "npm run db:init 可初始化数据库",
+        "数据库文件存储在 data/procurement.db",
+        "提供基础查询接口: query(), insert(), update()"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-DATA-001"],
+      "notes": "使用 better-sqlite3 包，支持同步查询"
+    },
+    {
+      "id": "US-DATA-003",
+      "title": "构建模拟数据生成器",
+      "description": "开发MockDataGenerator，基于业务规则生成逼真的采购数据，支持时间序列、随机波动、季节性",
+      "acceptanceCriteria": [
+        "server/src/utils/mock-generator.js 存在",
+        "支持生成: 采购订单(1万条+)、库存记录、价格历史、供应商主数据",
+        "数据符合业务逻辑: 价格有趋势性+随机波动",
+        "支持指定时间范围生成(默认2024-2025年)",
+        "生成速度: 1万条<3秒",
+        "npm run generate:mock 可执行"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-DATA-002"],
+      "notes": "使用faker.js生成真实感数据，保留随机种子支持可复现"
+    },
+    {
+      "id": "US-DATA-004",
+      "title": "实现指标计算引擎",
+      "description": "开发MetricsEngine，基于原始数据计算Dashboard所需的37个KPI指标",
+      "acceptanceCriteria": [
+        "server/src/services/metrics-engine.js 存在",
+        "实现核心指标: 采购额、降本额、降本率、预算执行率、库存周转天数等",
+        "支持多维度聚合: 按事业部/子公司/品类/时间",
+        "支持同比/环比计算",
+        "提供缓存机制避免重复计算",
+        "所有指标计算有单元测试"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-DATA-003"],
+      "notes": "指标定义参考docs/superpowers/knowledge-base/01-kpi-dictionary/"
+    },
+    {
+      "id": "US-DATA-005",
+      "title": "创建数据API层",
+      "description": "将现有前端硬编码数据改为从API获取，提供RESTful接口供Dashboard调用",
+      "acceptanceCriteria": [
+        "server/src/routes/dashboard.js 存在",
+        "API: GET /api/dashboard/kpi-cards 返回10个KPI",
+        "API: GET /api/dashboard/alerts 返回P0预警",
+        "API: GET /api/dashboard/rankings 返回组织排名",
+        "API: GET /api/dashboard/charts/:chartId 返回图表数据",
+        "响应时间<200ms(本地)",
+        "接口有JSDoc注释"
+      ],
+      "priority": 3,
+      "passes": false,
+      "dependsOn": ["US-DATA-004"],
+      "notes": "保持现有前端数据结构，只做数据源替换"
+    },
+    {
+      "id": "US-DATA-006",
+      "title": "前端数据联动改造",
+      "description": "改造前端代码，从API获取数据替换硬编码，添加加载状态和错误处理",
+      "acceptanceCriteria": [
+        "assets/js/api/client.js 封装fetch请求",
+        "assets/js/services/data-service.js 统一数据获取",
+        "所有图表组件支持异步数据加载",
+        "添加loading动画(保持科技风)",
+        "添加错误重试机制",
+        "保留mock数据作为fallback"
+      ],
+      "priority": 3,
+      "passes": false,
+      "dependsOn": ["US-DATA-005"],
+      "notes": "使用现有ECharts的loading样式，数据格式与现有保持一致"
+    },
+    {
+      "id": "US-DATA-007",
+      "title": "WhatIf模拟器数据层增强",
+      "description": "将WhatIf模拟器从纯前端计算改为读取真实基线数据，支持保存情景",
+      "acceptanceCriteria": [
+        "WhatIf基线从数据库读取当前真实数据",
+        "API: POST /api/whatif/scenarios 保存情景",
+        "API: GET /api/whatif/scenarios 获取历史情景",
+        "API: DELETE /api/whatif/scenarios/:id 删除情景",
+        "支持对比多个情景",
+        "情景数据持久化到数据库"
+      ],
+      "priority": 4,
+      "passes": false,
+      "dependsOn": ["US-DATA-005"],
+      "notes": "扩展现有的whatif-panel.js，添加API调用层"
+    },
+    {
+      "id": "US-DATA-008",
+      "title": "数据导出与报告",
+      "description": "支持将分析结果导出为Excel/PDF，生成周一晨会报告",
+      "acceptanceCriteria": [
+        "API: GET /api/export/dashboard-excel 导出Excel",
+        "API: GET /api/export/dashboard-pdf 导出PDF",
+        "包含所有KPI和图表数据",
+        "PDF使用Puppeteer生成",
+        "保留深色科技风样式",
+        "前端添加导出按钮"
+      ],
+      "priority": 4,
+      "passes": false,
+      "dependsOn": ["US-DATA-006"],
+      "notes": "Excel使用xlsx包，PDF使用puppeteer"
+    },
+    {
+      "id": "US-DATA-009",
+      "title": "数据同步模拟(未来扩展)",
+      "description": "设计数据同步接口，预留ERP/ARIBA接入点，模拟增量同步",
+      "acceptanceCriteria": [
+        "docs/integration/erp-interface.md 接口文档",
+        "server/src/services/sync-service.js 同步服务框架",
+        "支持CSV导入作为临时方案",
+        "模拟定时同步任务",
+        "记录同步日志"
+      ],
+      "priority": 5,
+      "passes": false,
+      "dependsOn": ["US-DATA-002"],
+      "notes": "此Story为未来真实接入做准备，本次只完成框架"
+    },
+    {
+      "id": "US-DATA-010",
+      "title": "集成测试与验证",
+      "description": "端到端测试数据流，验证从生成→计算→展示全链路",
+      "acceptanceCriteria": [
+        "server/test/data-pipeline.test.js E2E测试",
+        "测试覆盖: 数据生成→入库→API→前端展示",
+        "性能测试: 1万条数据查询<100ms",
+        "数据一致性检查",
+        "前端自动化测试: npm run test:e2e"
+      ],
+      "priority": 5,
+      "passes": false,
+      "dependsOn": ["US-DATA-006", "US-DATA-008"],
+      "notes": "使用Playwright做前端E2E测试"
+    }
+  ]
+}
