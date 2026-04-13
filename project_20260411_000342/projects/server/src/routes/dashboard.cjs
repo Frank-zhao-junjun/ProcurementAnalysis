@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const demoData = require('../demo-data');
+const demoData = require('../demo-data/index.cjs');
 
 // 初始化数据
 demoData.initialize();

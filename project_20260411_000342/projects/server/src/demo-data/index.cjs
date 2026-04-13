@@ -13,7 +13,7 @@ let dataCache = null;
 function initializeData() {
   if (dataCache) return dataCache;
   
-  const dataDir = path.join(__dirname, '../../data');
+  const dataDir = path.join(__dirname, '../../../data');
   
   dataCache = {
     suppliers: JSON.parse(fs.readFileSync(path.join(dataDir, 'suppliers.json'), 'utf8')),

@@ -16,7 +16,8 @@ export function buildRuntimeContext(snapshot) {
     selectedDimension: snapshot.ui.selectedDimension,
     activeFilters: snapshot.ui.activeFilters,
     selectedEntity: snapshot.ui.selectedEntity,
-    highlightedChart: snapshot.ui.highlightedChart
+    highlightedChart: snapshot.ui.highlightedChart,
+    kpiSnapshot: snapshot.ui.kpiSnapshot ?? null
   };
 }
 

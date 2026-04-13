@@ -6,11 +6,16 @@
 (function() {
   'use strict';
 
-  // 配置
+  // 配置（与 api/client.js 一致：优先 window.__API_BASE_URL__ / __PI_API_BASE__）
   const CONFIG = {
-    API_BASE_URL: window.location.origin.includes('localhost') 
-      ? 'http://localhost:3000/api' 
-      : '/api',
+    API_BASE_URL:
+      (typeof window !== 'undefined' && window.__PI_API_BASE__) ||
+      (typeof window !== 'undefined' && window.__API_BASE_URL__
+        ? String(window.__API_BASE_URL__).replace(/\/?$/, '')
+        : null) ||
+      (window.location.origin.includes('localhost') || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/api'
+        : `${window.location.origin}/api`),
     DEFAULT_YEAR: 2025,
     DEFAULT_MONTH: 6,
     RETRY_COUNT: 3,
@@ -93,6 +98,21 @@
       return this.request(`/dashboard/charts/${chartId}?year=${year}&month=${month}`);
     }
   };
+
+  /** 广播 KPI 快照供 AI runtimeContext / 其他模块订阅（Ralph US-002） */
+  function emitKpiSnapshot(kpis, source) {
+    try {
+      window.dispatchEvent(new CustomEvent('pi-dashboard-kpi-sync', {
+        detail: {
+          kpis,
+          source: source || 'dashboard-init',
+          updatedAt: new Date().toISOString()
+        }
+      }));
+    } catch (err) {
+      console.warn('[DashboardInit] pi-dashboard-kpi-sync:', err);
+    }
+  }
 
   // 页面更新器
   const pageUpdater = {
@@ -240,6 +260,7 @@
 
       // 更新页面
       pageUpdater.updateKPICards(kpiData);
+      emitKpiSnapshot(kpiData, 'api');
       pageUpdater.updateAlerts(alertsData);
       pageUpdater.updateRankings(rankingsData);
 
@@ -261,6 +282,7 @@
           api.getAlerts()
         ]);
         pageUpdater.updateKPICards(freshKPI);
+        emitKpiSnapshot(freshKPI, 'api-poll');
         pageUpdater.updateAlerts(freshAlerts);
       }, 5 * 60 * 1000); // 5分钟刷新
 
@@ -299,6 +321,7 @@
       };
       
       pageUpdater.updateKPICards(fallbackData);
+      emitKpiSnapshot(fallbackData, 'fallback-json');
       
     } catch (err) {
       console.warn('[DashboardInit] 备用数据也失败了:', err);
@@ -317,17 +340,11 @@
         api.getRankings()
       ]);
       pageUpdater.updateKPICards(kpi);
+      emitKpiSnapshot(kpi, 'manual-refresh');
       pageUpdater.updateAlerts(alerts);
       pageUpdater.updateRankings(rankings);
       return { kpi, alerts, rankings };
     }
   };
-
-  // 自动初始化（如果页面加载完成）
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initDashboard, 100);
-  } else {
-    document.addEventListener('DOMContentLoaded', initDashboard);
-  }
 
 })();

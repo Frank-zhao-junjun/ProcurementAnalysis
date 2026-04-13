@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1920" />
   <title>采购经营分析大屏 - Procurement Intelligence Dashboard</title>
+  <!--
+    部署到 code.coze.site 等「仅静态文件」沙箱时：Node API 需另部署；在此（须早于 api/client.js）写入你的 API 根地址，例如：
+    <script>
+      window.__API_BASE_URL__ = 'https://你的主机:3000/api';
+      window.__AI_PROXY_ENDPOINT__ = 'https://你的主机:3000/api/ai-proxy/chat';
+    </script>
+    后端 CORS 需允许该沙箱页面 Origin；生产环境勿开启 ALLOW_DEV_TOKEN。
+  -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
   <!-- 数据服务层 -->
   <script src="./assets/js/api/client.js"></script>
@@ -810,6 +818,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <script type="module">
 import { createDashboardStateBus, createInitialDashboardState } from './assets/js/ai/state-bus.js';
 import { createContextBridge } from './assets/js/ai/context-bridge.js';
+import { ensureDevJwt } from './assets/js/ai/bootstrap-jwt.js';
 import { bootAssistantShell, createProxyMessageSender } from './assets/js/ai/assistant-shell.js';
 import { createAiPrivacyGate } from './assets/js/ai/privacy-gate.js';
 import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
@@ -925,9 +934,6 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-
-  // 启动AI助手浮层
-  bootAssistantShell();
   /* ================================================================
      PART 2: 维度切换数据骨架 (可扩展)
      
@@ -1808,7 +1814,13 @@ import { bootWhatIfPanel } from './assets/js/whatif/whatif-panel.js';
   window.addEventListener('resize', handleResize);
 
   // DOM Ready后初始化
-  function init() {
+  async function init() {
+    await ensureDevJwt();
+    window.addEventListener('pi-dashboard-kpi-sync', (ev) => {
+      const d = ev.detail;
+      if (!d) return;
+      dashboardStateBus.update({ ui: { kpiSnapshot: d } });
+    });
     aiContextBridge.syncTab(_activeTab);
     bindFilterEvents();
     const privacyGate = createAiPrivacyGate();

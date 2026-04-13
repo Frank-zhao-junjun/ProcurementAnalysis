@@ -98,6 +98,13 @@ export function createAiProxyRouter({
 } = {}) {
   const router = Router();
 
+  router.get('/health', (_req, res) => {
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   router.post('/chat', requireAuth, async (req, res) => {
     const cacheKey = createCacheKey(req);
     const cachedEntry = cache.get(cacheKey);

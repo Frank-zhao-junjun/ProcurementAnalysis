@@ -6,7 +6,7 @@ import {
   createDashboardStateBus,
   createInitialDashboardState
 } from '../../assets/js/ai/state-bus.js';
-import { createContextBridge } from '../../assets/js/ai/context-bridge.js';
+import { createContextBridge, buildRuntimeContext } from '../../assets/js/ai/context-bridge.js';
 import { createAssistantShell, createProxyMessageSender } from '../../assets/js/ai/assistant-shell.js';
 import { createAiPrivacyGate } from '../../assets/js/ai/privacy-gate.js';
 
@@ -378,4 +378,22 @@ test('proxy message sender posts auth header and runtime context to ai-proxy', a
     message: '本月降本达成率是多少？',
     runtimeContext
   });
+});
+
+test('buildRuntimeContext includes kpiSnapshot for AI proxy payload (Ralph US-005)', () => {
+  const snapshot = createInitialDashboardState({
+    session: { userRole: 'procurement_manager' },
+    ui: {
+      activeTab: 'tab1',
+      activeModule: '降本分析',
+      kpiSnapshot: {
+        kpis: { savingsRate: 5.2, savingsAmount: 1240 },
+        source: 'api',
+        updatedAt: '2026-04-13T00:00:00.000Z'
+      }
+    }
+  });
+  const ctx = buildRuntimeContext(snapshot);
+  assert.equal(ctx.kpiSnapshot.source, 'api');
+  assert.equal(ctx.kpiSnapshot.kpis.savingsRate, 5.2);
 });

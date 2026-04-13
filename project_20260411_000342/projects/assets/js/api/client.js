@@ -1,10 +1,29 @@
 /**
  * API 客户端
  * 封装 fetch 请求，统一错误处理
+ *
+ * 部署到静态沙箱、API 在其它域名时：在页面最早处设置
+ *   window.__API_BASE_URL__ = 'https://你的后端/api';
  */
 
-const API_BASE_URL = window.location.origin.includes('localhost') 
-  ? 'http://localhost:3000/api' 
+(function resolvePiApiBaseOnce() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  if (window.__API_BASE_URL__) {
+    window.__PI_API_BASE__ = String(window.__API_BASE_URL__).replace(/\/?$/, '');
+    return;
+  }
+  const h = window.location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1') {
+    window.__PI_API_BASE__ = 'http://localhost:3000/api';
+    return;
+  }
+  window.__PI_API_BASE__ = `${window.location.origin}/api`;
+})();
+
+const API_BASE_URL = typeof window !== 'undefined' && window.__PI_API_BASE__
+  ? window.__PI_API_BASE__
   : '/api';
 
 class ApiClient {

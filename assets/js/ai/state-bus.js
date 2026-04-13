@@ -45,7 +45,8 @@ export function createInitialDashboardState(overrides = {}) {
       selectedDimension: '集团',
       activeFilters: {},
       selectedEntity: null,
-      highlightedChart: null
+      highlightedChart: null,
+      kpiSnapshot: null
     }
   }, overrides);
 }
